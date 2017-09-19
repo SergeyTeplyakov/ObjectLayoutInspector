@@ -44,9 +44,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClassLayoutTests.cs" />
+    <Compile Include="ClassWithNestedStructPrinterTests.cs" />
+    <Compile Include="ExcessivePaddings.cs" />
+    <Compile Include="InstanceSizeTests.cs" />
     <Compile Include="PrinterTests.cs" />
-    <Compile Include="DominoLike.cs" />
+    <Compile Include="NodeTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RawLayoutTests.cs" />
+    <Compile Include="StructLayoutTests.cs" />
+    <Compile Include="StructSizeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

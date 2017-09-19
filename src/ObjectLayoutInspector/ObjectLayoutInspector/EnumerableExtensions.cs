@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
-namespace ObjectLayoutInspector2
+namespace ObjectLayoutInspector
 {
     internal static class EnumerableExtensions
     {
