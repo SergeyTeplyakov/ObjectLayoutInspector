@@ -5,6 +5,7 @@ namespace ObjectLayoutInspector
     public abstract class FieldLayoutBase
     {
         public int Size { get; }
+        public int Padding { get; }
         public int Offset { get; }
 
         protected FieldLayoutBase(int size, int offset)

@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace ObjectLayoutInspector
 {
@@ -109,7 +107,6 @@ namespace ObjectLayoutInspector
 
             var method = new DynamicMethod(
                 name: "GenerateTypeForSizeComputation",
-                //returnType: returnType,
                 returnType: typeof(object),
                 parameterTypes: new Type[0],
                 m: typeof(InspectorHelper).Module,
@@ -118,12 +115,12 @@ namespace ObjectLayoutInspector
             ILGenerator ilGen = method.GetILGenerator();
 
             // This method generates the following function:
-            // SizeComputer<FieldType> GenerateTypeForSizeComputation()
-            // {
+            //object GenerateTypeForSizeComputation()
+            //{
             //    SizeComputer<FieldType> l1 = default(SizeComputer<FieldType>);
             //    object l2 = l1; // box the local
             //    return l2;
-            // }
+            //}
 
             ilGen.DeclareLocal(returnType);
             ilGen.DeclareLocal(typeof(object));
@@ -167,7 +164,7 @@ namespace ObjectLayoutInspector
 
             var baseLine = addresses.Min();
             
-            // Convert field addresses to offsets using the first field as a baseline
+            // Converting field addresses to offsets using the first field as a baseline
             return fields
                 .Select((field, index) => (field: field, offset: (int)(addresses[index] - baseLine)))
                 .OrderBy(tpl => tpl.offset)
@@ -213,7 +210,7 @@ namespace ObjectLayoutInspector
                 // Getting the address for a given field
                 ilGen.Emit(OpCodes.Ldflda, fields[i]);
 
-                // Convertinng field offset to long
+                // Converting field offset to long
                 ilGen.Emit(OpCodes.Conv_I8);
 
                 // Storing the offset in the array
@@ -224,116 +221,6 @@ namespace ObjectLayoutInspector
             ilGen.Emit(OpCodes.Ret);
 
             return (Func<object, long[]>)method.CreateDelegate(typeof(Func<object, long[]>));
-        }
-
-        /// <summary>
-        /// Prints the given <typeparamref name="T"/> to the console.
-        /// </summary>
-        public static void Print<T>(bool recursively = true) => Print(typeof(T), recursively);
-
-        /// <summary>
-        /// Prints the given <paramref name="type"/> to the console.
-        /// </summary>
-        public static void Print(Type type, bool recursively = true)
-        {
-            Console.WriteLine($"Type layout for '{type.Name}'");
-
-            var layout = TypeLayout.GetLayout(type);
-            int emptiness = (layout.Paddings * 100) / layout.Size;
-            Console.WriteLine($"Size: {layout.Size}. Paddings: {layout.Paddings} (%{emptiness} of empty space)");
-
-            Console.WriteLine(TypeLayoutAsString(type, recursively));
-        }
-
-        private static string TypeLayoutAsString(Type type, bool recursively = true)
-        {
-            var layout = TypeLayout.GetLayout(type);
-
-            var fieldAsStrings = new List<string>(layout.Fields.Length);
-
-            // Header description strings for a reference type
-            if (!type.IsValueType)
-            {
-                var (header, mtPtr) = PrintHeader();
-                fieldAsStrings.Add(header);
-                fieldAsStrings.Add(mtPtr);
-            }
-
-            foreach (var field in layout.Fields)
-            {
-                string fieldAsString = field.ToString();
-
-                if (recursively && field is FieldLayout fl)
-                {
-                    var fieldLayout = TypeLayout.GetLayout(fl.FieldInfo.FieldType);
-                    if (fieldLayout.Fields.Length > 1)
-                    {
-                        fieldAsString += $"\r\n{TypeLayoutAsString(fl.FieldInfo.FieldType)}";
-                    }
-                }
-
-                fieldAsStrings.Add(fieldAsString);
-            }
-
-            int maxLength = fieldAsStrings.Count > 0
-                ? fieldAsStrings
-                    .SelectMany(s => s.Split(new [] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries))
-                    .Max(s => s.Length + 4)
-                : 2;
-
-            string stringRep = PrintLayout(type.IsValueType);
-
-            return stringRep;
-
-            (string header, string methodTablePtr) PrintHeader()
-            {
-                int ptrSize = IntPtr.Size;
-                return (
-                    header: $"Object Header ({ptrSize} bytes)",
-                    methodTablePtr: $"Method Table Ptr ({ptrSize} bytes)"
-                    );
-            }
-
-            string PrintLayout(bool isValueType)
-            {
-                var sb = new StringBuilder();
-                sb.AppendLine($"|{Repeat('=')}|");
-                int startIndex = 0;
-                if (!isValueType)
-                {
-                    sb.AppendLine(WithTrailingSpaces($"| {fieldAsStrings[0]} "))
-                        .AppendLine($"|{Repeat('-')}|")
-                        .AppendLine(WithTrailingSpaces($"| {fieldAsStrings[1]} "))
-                        .AppendLine($"|{Repeat('=')}|");
-
-                    startIndex = 2;
-                }
-
-                for (int i = startIndex; i < fieldAsStrings.Count; i++)
-                {
-                    foreach (var str in fieldAsStrings[i].Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        sb.AppendLine(WithTrailingSpaces($"| {str} "));
-                    }
-
-                    if (i != fieldAsStrings.Count - 1)
-                    {
-                        sb.AppendLine($"|{Repeat('-')}|");
-                    }
-                }
-
-                sb.AppendLine($"|{Repeat('=')}|");
-                return sb.ToString();
-
-                string WithTrailingSpaces(string str)
-                {
-                    int size = maxLength - str.Length - 1;
-
-                    return size > 0 ? $"{str}{new string(' ', size)}|" : $"{str}|";
-                }
-
-                string Repeat(char c) => new string(c, maxLength - 2);
-            }
         }
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 using NUnit.Framework;
 
 namespace ObjectLayoutInspector.Tests
@@ -24,24 +19,18 @@ namespace ObjectLayoutInspector.Tests
     }
 
     [TestFixture]
-    public class PrinterTests
+    public class StructWithExplicitLayoutTests
     {
         [Test]
         public void Print_NotAlignedStruct()
         {
-            ObjectLayoutInspector.InspectorHelper.Print<NotAlignedStruct>();
+            TypeLayout.PrintLayout<NotAlignedStruct>();
         }
 
         [Test]
         public void Print_StructWithExplicitLayout()
         {
-            ObjectLayoutInspector.InspectorHelper.Print<StructWithExplicitLayout>();
-        }
-
-        [Test]
-        public void Print_Node()
-        {
-            ObjectLayoutInspector.InspectorHelper.Print<DerivedExpression>();
+            TypeLayout.PrintLayout<StructWithExplicitLayout>();
         }
     }
 }

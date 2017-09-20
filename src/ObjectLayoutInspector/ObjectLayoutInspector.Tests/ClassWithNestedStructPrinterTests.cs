@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace ObjectLayoutInspector.Tests
 {
-    //[StructLayout(LayoutKind.Auto)]
+    [StructLayout(LayoutKind.Auto)]
     public struct NotAlignedStruct
     {
         public byte m_byte1;

@@ -1,20 +1,19 @@
 ﻿using System.Runtime.InteropServices;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace ObjectLayoutInspector.Tests
 {
     [TestFixture]
     public class StructLayoutTests
     {
-public struct NotAlignedStruct
-{
-    public byte m_byte1;
-    public int m_int;
+        public struct NotAlignedStruct
+        {
+            public byte m_byte1;
+            public int m_int;
 
-    public byte m_byte2;
-    public short m_short;
-}
+            public byte m_byte2;
+            public short m_short;
+        }
 
         [Test]
         public void TestNonAlignedStruct()
@@ -37,15 +36,15 @@ public struct NotAlignedStruct
             TypeLayout.PrintLayout<NotAlignedStructWithPack1>();
         }
 
-[StructLayout(LayoutKind.Auto)]
-public struct NotAlignedStructWithAutoLayout
-{
-    public byte m_byte1;
-    public int m_int;
+        [StructLayout(LayoutKind.Auto)]
+        public struct NotAlignedStructWithAutoLayout
+        {
+            public byte m_byte1;
+            public int m_int;
 
-    public byte m_byte2;
-    public short m_short;
-}
+            public byte m_byte2;
+            public short m_short;
+        }
 
         [Test]
         public void TestNonAlignedStructWithAutoLayout()

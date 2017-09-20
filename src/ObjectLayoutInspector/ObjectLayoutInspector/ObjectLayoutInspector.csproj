@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="FieldLayoutBase.cs" />
+    <Compile Include="LayoutPrinter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeLayout.cs" />
     <Compile Include="InspectorHelper.cs" />

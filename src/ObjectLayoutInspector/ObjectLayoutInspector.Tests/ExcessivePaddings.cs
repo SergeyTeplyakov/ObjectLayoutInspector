@@ -1,14 +1,23 @@
 ﻿using System.Runtime.InteropServices;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace ObjectLayoutInspector.Tests
 {
+    // Uncomment the following line to see the difference.
+//#define UseAlias
+
+#if UseAlias
+    using ByteWrapper = System.Byte;
+#else
+    internal struct ByteWrapper
+    {
+        public byte b;
+    }
+#endif
+
     [TestFixture]
     public class ExcessivePaddings
     {
-        
-
         internal struct StructMultipleByteWrappers
         {
             public ByteWrapper bw1;
@@ -19,18 +28,14 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void PrintStructMultipleByteWrappersLayout()
         {
+            // If the layout is sequential, then structs are aligned properly with no paddings
             TypeLayout.PrintLayout<StructMultipleByteWrappers>();
+            Assert.That(TypeLayout.GetLayout<StructMultipleByteWrappers>().Size, Is.EqualTo(3));
         }
 
-        internal struct ByteWrapper
+        [StructLayout(LayoutKind.Auto)]
+        internal struct StructWithAutomaticLayout
         {
-            public byte b;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        internal class ClassMultipleByteWrappers
-        {
-            public object o;
             public ByteWrapper bw1;
             public ByteWrapper bw2;
             public ByteWrapper bw3;
@@ -39,7 +44,9 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void PrintClassMultipleByteWrappersLayout()
         {
-            TypeLayout.PrintLayout<ClassMultipleByteWrappers>();
+            // In this case every field aligned on the pointer boundaries
+            TypeLayout.PrintLayout<StructWithAutomaticLayout>();
+            Assert.That(TypeLayout.GetLayout<StructMultipleByteWrappers>().Size, Is.EqualTo(24));
         }
     }
 }
