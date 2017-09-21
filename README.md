@@ -1,6 +1,6 @@
 # Getting an instance layout at runtime
 
-(https://github.com/SergeyTeplyakov/DissectingTheCode/blob/master/posts/Images/FieldsLayout_Figure1.gif "Demo")
+![Demo](https://github.com/SergeyTeplyakov/DissectingTheCode/blob/master/posts/Images/FieldsLayout_Figure1.gif "Demo")
 
 There is no official documentation about fields layout because the CLR authors reserved the right to change it in the future. But knowledge about the layout can be helpful if you're curious or if you're working on a performance critical application. 
 
