@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.Serialization;
+using ObjectLayoutInspector.Helpers;
 
 namespace ObjectLayoutInspector
 {
@@ -87,8 +89,10 @@ namespace ObjectLayoutInspector
         /// </summary>
         struct SizeComputer<T>
         {
+#pragma warning disable 169 Unused field
             public T field1;
             public T field2;
+#pragma warning restore 169 Unused field
         }
 
         /// <summary>
@@ -150,11 +154,19 @@ namespace ObjectLayoutInspector
 
         public static (FieldInfo fieldInfo, int offset)[] GetFieldOffsets(Type t)
         {
-            var fields = t.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+            // GetFields does not return private fields from the base types.
+            // Need to use a custom helper function.
+            var fields = t.GetInstanceFields();
+            //var fields2 = t.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
 
             Func<object, long[]> fieldOffsetInspector = GenerateFieldOffsetInspectionFunction(fields);
 
-            var instance = CreateInstance(t);
+            var (instance, success) = ReflectionHelper.TryCreateInstanceSafe(t);
+            if (!success)
+            {
+                return Array.Empty<(FieldInfo, int)>();
+            }
+
             var addresses = fieldOffsetInspector(instance);
 
             if (addresses.Length == 0)
@@ -169,11 +181,6 @@ namespace ObjectLayoutInspector
                 .Select((field, index) => (field: field, offset: (int)(addresses[index] - baseLine)))
                 .OrderBy(tpl => tpl.offset)
                 .ToArray();
-        }
-
-        private static object CreateInstance(Type t)
-        {
-            return t.IsValueType ? Activator.CreateInstance(t) : FormatterServices.GetUninitializedObject(t);
         }
 
         private static Func<object, long[]> GenerateFieldOffsetInspectionFunction(FieldInfo[] fields)
