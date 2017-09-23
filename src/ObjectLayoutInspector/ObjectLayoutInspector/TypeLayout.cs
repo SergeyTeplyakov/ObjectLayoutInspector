@@ -43,8 +43,9 @@ namespace ObjectLayoutInspector
 
             // TODO: this can be expensive.
             var nestedPaddings = fields
-                // Skipping primitive types are recursive and they don't have any paddings.
-                .OfType<FieldLayout>().Where(fl => !fl.FieldInfo.FieldType.IsPrimitive).Select(fl => GetLayout(fl.FieldInfo.FieldType))
+                // Need to include paddings for value types only
+                // because we can't tell if the reference is exclusive or shared.
+                .OfType<FieldLayout>().Where(fl => fl.FieldInfo.FieldType.IsValueType).Select(fl => GetLayout(fl.FieldInfo.FieldType))
                 .Sum(tl => tl.Paddings);
             
             Paddings = thisInstancePaddings + nestedPaddings;
