@@ -23,17 +23,31 @@ namespace ObjectLayoutInspector
             int emptiness = (layout.Paddings * 100) / layout.Size;
             Console.WriteLine($"Size: {layout.Size} bytes. Paddings: {layout.Paddings} bytes (%{emptiness} of empty space)");
 
-            Console.WriteLine(TypeLayoutAsString(type, recursively));
+            Console.WriteLine(LayoutAsString(type, recursively));
         }
 
-        private static string TypeLayoutAsString(Type type, bool recursively = true)
+        public static void Print(TypeLayout layout, bool recursively = true)
+        {
+            Console.WriteLine($"Type layout for '{layout.Type.Name}'");
+
+            int emptiness = (layout.Paddings * 100) / layout.Size;
+            Console.WriteLine($"Size: {layout.Size} bytes. Paddings: {layout.Paddings} bytes (%{emptiness} of empty space)");
+
+            Console.WriteLine(TypeLayoutAsString(layout, recursively));
+        }
+
+        private static string LayoutAsString(Type type, bool recursively = true)
         {
             var layout = TypeLayout.GetLayout(type);
+            return TypeLayoutAsString(layout, recursively);
+        }
 
+        private static string TypeLayoutAsString(TypeLayout layout, bool recursively = true)
+        {
             var fieldAsStrings = new List<string>(layout.Fields.Length);
 
             // Header description strings for a reference type
-            if (!type.IsValueType)
+            if (!layout.Type.IsValueType)
             {
                 var (header, mtPtr) = PrintHeader();
                 fieldAsStrings.Add(header);
@@ -44,12 +58,14 @@ namespace ObjectLayoutInspector
             {
                 string fieldAsString = field.ToString();
 
-                if (recursively && field is FieldLayout fl)
+                // It make no sense to print fields of reference types recursively,
+                // because technically, they're allocated in separate memory location.
+                if (recursively && field is FieldLayout fl && fl.FieldInfo.FieldType.IsValueType)
                 {
                     var fieldLayout = TypeLayout.GetLayout(fl.FieldInfo.FieldType);
                     if (fieldLayout.Fields.Length > 1)
                     {
-                        fieldAsString += $"\r\n{TypeLayoutAsString(fl.FieldInfo.FieldType)}";
+                        fieldAsString += $"\r\n{LayoutAsString(fl.FieldInfo.FieldType)}";
                     }
                 }
 
@@ -62,7 +78,7 @@ namespace ObjectLayoutInspector
                     .Max(s => s.Length + 4)
                 : 2;
 
-            string stringRep = PrintLayout(type.IsValueType);
+            string stringRep = PrintLayout(layout.Type.IsValueType);
 
             return stringRep;
 

@@ -53,6 +53,7 @@
     <Compile Include="ExcessivePaddings.cs" />
     <Compile Include="InstanceSizeTests.cs" />
     <Compile Include="PaddingTests.cs" />
+    <Compile Include="RunManually\LayoutsForAllKnownTypes.cs" />
     <Compile Include="StructWithExplicitLayoutTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RawLayoutTests.cs" />

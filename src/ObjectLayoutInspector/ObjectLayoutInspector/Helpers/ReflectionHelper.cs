@@ -66,18 +66,45 @@ namespace ObjectLayoutInspector.Helpers
                 return Success(string.Empty);
             }
 
-            return Success(FormatterServices.GetUninitializedObject(t));
+            // It is actually possible that GetUnitializedObject will return null.
+            // I've got null for some security related types.
+            return Success(GetUninitializedObject(t));
 
-            (object result, bool success) Success(object o) => (o, true);
+            (object result, bool success) Success(object o) => (o, o != null);
+        }
+
+        private static object GetUninitializedObject(Type t)
+        {
+            try
+            {
+                return FormatterServices.GetUninitializedObject(t);
+            }
+            catch (TypeInitializationException)
+            {
+                return null;
+            }
         }
 
         /// <summary>
         /// Returns true if the instance of type <paramref name="t"/> can be instantiated.
         /// </summary>
-        public static bool CanCreateInstance(Type t)
+        public static bool CanCreateInstance(this Type t)
         {
             // Abstract types and generics are not supported
-            if (t.IsAbstract || IsOpenGenericType(t))
+            if (t.IsAbstract || IsOpenGenericType(t) || t.IsCOMObject)
+            {
+                return false;
+            }
+
+            if (t == typeof(ArgIterator) || t == typeof(RuntimeArgumentHandle) || t == typeof(TypedReference) || t.Name == "Void"
+                || t == typeof(IsVolatile) || t == typeof(RuntimeFieldHandle) || t == typeof(RuntimeMethodHandle) ||
+                t == typeof(RuntimeTypeHandle))
+            {
+                // This is a special type
+                return false;
+            }
+
+            if (t.BaseType == typeof(ContextBoundObject))
             {
                 return false;
             }

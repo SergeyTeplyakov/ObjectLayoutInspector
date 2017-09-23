@@ -34,7 +34,7 @@ namespace ObjectLayoutInspector.Tests
         }
 
         [StructLayout(LayoutKind.Auto)]
-        internal struct StructWithAutomaticLayout
+        internal class StructWithAutomaticLayout
         {
             public ByteWrapper bw1;
             public ByteWrapper bw2;
@@ -46,7 +46,7 @@ namespace ObjectLayoutInspector.Tests
         {
             // In this case every field aligned on the pointer boundaries
             TypeLayout.PrintLayout<StructWithAutomaticLayout>();
-            Assert.That(TypeLayout.GetLayout<StructMultipleByteWrappers>().Size, Is.EqualTo(24));
+            Assert.That(TypeLayout.GetLayout<StructWithAutomaticLayout>().Size, Is.EqualTo(24));
         }
     }
 }

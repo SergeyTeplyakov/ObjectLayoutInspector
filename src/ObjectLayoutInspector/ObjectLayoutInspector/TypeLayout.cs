@@ -31,24 +31,37 @@ namespace ObjectLayoutInspector
 
         public FieldLayoutBase[] Fields { get; }
 
-        public TypeLayout(Type type, int size, int overhead, FieldLayoutBase[] fields)
+        private TypeLayout(Type type, int size, int overhead, FieldLayoutBase[] fields, TypeLayoutCache cache)
         {
             Type = type;
             Size = size;
             Overhead = overhead;
             Fields = fields;
-            // We can't get padding information for unsafe struct.
+
+            // We can't get padding information for unsafe structs.
             // Assuming there is no one.
             var thisInstancePaddings = type.IsUnsafeValueType() ? 0 : fields.OfType<Padding>().Sum(p => p.Size);
 
-            // TODO: this can be expensive.
+            cache = cache ?? TypeLayoutCache.Create();
+
             var nestedPaddings = fields
                 // Need to include paddings for value types only
                 // because we can't tell if the reference is exclusive or shared.
-                .OfType<FieldLayout>().Where(fl => fl.FieldInfo.FieldType.IsValueType).Select(fl => GetLayout(fl.FieldInfo.FieldType))
+                .OfType<FieldLayout>()
+                // Primitive types can be recursive.
+                .Where(fl => fl.FieldInfo.FieldType.IsValueType && !fl.FieldInfo.FieldType.IsPrimitive)
+                .Select(fl => GetLayout(fl.FieldInfo.FieldType, cache, includePaddings: true))
                 .Sum(tl => tl.Paddings);
             
             Paddings = thisInstancePaddings + nestedPaddings;
+
+            // Updating the cache.
+            cache.LayoutCache.AddOrUpdate(type, this, (t, layout) => layout);
+        }
+
+        public void PrintLayout()
+        {
+            LayoutPrinter.Print(this);
         }
 
         public static void PrintLayout<T>(bool recursively = true)
@@ -56,43 +69,73 @@ namespace ObjectLayoutInspector
             LayoutPrinter.Print<T>(recursively);
         }
 
-        public static TypeLayout GetLayout<T>(bool includePaddings = true)
+        public static TypeLayout? TryGetLayout(Type type, TypeLayoutCache cache)
         {
-            return GetLayout(typeof(T), includePaddings);
-        }
-
-        public static TypeLayout GetLayout(Type type, bool includePaddings = true)
-        {
-            var (size, overhead) = InspectorHelper.GetSize(type);
-
-            var fieldsOffsets = InspectorHelper.GetFieldOffsets(type);
-            var fields = new List<FieldLayoutBase>();
-
-            for (var index = 0; index < fieldsOffsets.Length; index++)
+            if (type.CanCreateInstance())
             {
-                var fieldOffset = fieldsOffsets[index];
-                var fieldInfo = new FieldLayout(fieldOffset.offset, fieldOffset.fieldInfo);
-                fields.Add(fieldInfo);
-
-                if (includePaddings)
-                {
-                    int nextOffsetOrSize = size;
-                    if (index != fieldsOffsets.Length - 1)
-                    {
-                        // This is not a last field.
-                        nextOffsetOrSize = fieldsOffsets[index + 1].offset;
-                    }
-
-                    var nextSectionOffsetCandidate = fieldInfo.Offset + fieldInfo.Size;
-                    if (nextSectionOffsetCandidate < nextOffsetOrSize)
-                    {
-                        // we have padding
-                        fields.Add(new Padding(nextOffsetOrSize - nextSectionOffsetCandidate, nextSectionOffsetCandidate));
-                    }
-                }
+                return GetLayout(type, cache);
             }
 
-            return new TypeLayout(type, size, overhead, fields.ToArray());
+            return null;
+        }
+
+        public static TypeLayout GetLayout<T>(TypeLayoutCache cache = null, bool includePaddings = true)
+        {
+            return GetLayout(typeof(T), cache, includePaddings);
+        }
+
+        public static TypeLayout GetLayout(Type type, TypeLayoutCache cache = null, bool includePaddings = true)
+        {
+            if (cache != null && cache.LayoutCache.TryGetValue(type, out var result))
+            {
+                return result;
+            }
+
+            try
+            {
+                result = DoGetLayout();
+                cache?.LayoutCache.TryAdd(type, result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Failed to create an instance of type {type}");
+                throw;
+            }            
+
+            TypeLayout DoGetLayout()
+            {
+                var (size, overhead) = InspectorHelper.GetSize(type);
+
+                var fieldsOffsets = InspectorHelper.GetFieldOffsets(type);
+                var fields = new List<FieldLayoutBase>();
+
+                for (var index = 0; index < fieldsOffsets.Length; index++)
+                {
+                    var fieldOffset = fieldsOffsets[index];
+                    var fieldInfo = new FieldLayout(fieldOffset.offset, fieldOffset.fieldInfo);
+                    fields.Add(fieldInfo);
+
+                    if (includePaddings)
+                    {
+                        int nextOffsetOrSize = size;
+                        if (index != fieldsOffsets.Length - 1)
+                        {
+                            // This is not a last field.
+                            nextOffsetOrSize = fieldsOffsets[index + 1].offset;
+                        }
+
+                        var nextSectionOffsetCandidate = fieldInfo.Offset + fieldInfo.Size;
+                        if (nextSectionOffsetCandidate < nextOffsetOrSize)
+                        {
+                            // we have padding
+                            fields.Add(new Padding(nextOffsetOrSize - nextSectionOffsetCandidate, nextSectionOffsetCandidate));
+                        }
+                    }
+                }
+
+                return new TypeLayout(type, size, overhead, fields.ToArray(), cache);
+            }
         }
 
         public bool Equals(TypeLayout other)

@@ -19,7 +19,7 @@ namespace ObjectLayoutInspector.Tests
         public void NoFieldsForEmptyClass()
         {
             var layout = TypeLayout.GetLayout<Empty>();
-            Assert.That(layout.FullSize, Is.Empty);
+            Assert.That(layout.Fields, Is.Empty);
         }
     }
 }
