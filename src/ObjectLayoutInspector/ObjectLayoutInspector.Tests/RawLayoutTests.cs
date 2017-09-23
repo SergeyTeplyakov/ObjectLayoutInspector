@@ -22,5 +22,24 @@ Console.WriteLine(
             .Select(tpl => $"Field {tpl.fieldInfo.Name}: starts at offset {tpl.offset}"))
     );
         }
+
+#pragma warning disable 169 // unused fields
+        class Base
+        {
+            private object o;
+        }
+
+        class Derived : Base
+        {
+            private object o;
+#pragma warning restore 169 // unused fields
+        }
+
+        [Test]
+        public void PrivateBaseMembersShouldBeIncluded()
+        {
+            var offsets = InspectorHelper.GetFieldOffsets(typeof(Derived));
+            Assert.That(offsets.Length, Is.EqualTo(2));
+        }
     }
 }
