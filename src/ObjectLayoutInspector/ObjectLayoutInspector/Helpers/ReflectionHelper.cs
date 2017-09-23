@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
 namespace ObjectLayoutInspector.Helpers
@@ -68,8 +69,6 @@ namespace ObjectLayoutInspector.Helpers
             return Success(FormatterServices.GetUninitializedObject(t));
 
             (object result, bool success) Success(object o) => (o, true);
-
-            
         }
 
         /// <summary>
@@ -88,6 +87,14 @@ namespace ObjectLayoutInspector.Helpers
             {
                 return type.IsGenericTypeDefinition && !type.IsConstructedGenericType;
             }
+        }
+
+        /// <summary>
+        /// Returns true if a given type is unsafe.
+        /// </summary>
+        public static bool IsUnsafeValueType(this Type t)
+        {
+            return t.GetCustomAttribute(typeof(UnsafeValueTypeAttribute)) != null;
         }
     }
 }

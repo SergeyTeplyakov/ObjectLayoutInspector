@@ -23,6 +23,7 @@ Console.WriteLine(
     );
         }
 
+#pragma warning disable 169 // unused fields
         class Base
         {
             private object o;
@@ -31,6 +32,7 @@ Console.WriteLine(
         class Derived : Base
         {
             private object o;
+#pragma warning restore 169 // unused fields
         }
 
         [Test]

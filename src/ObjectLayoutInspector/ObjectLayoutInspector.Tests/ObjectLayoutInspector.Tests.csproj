@@ -57,6 +57,7 @@
     <Compile Include="RawLayoutTests.cs" />
     <Compile Include="StructLayoutTests.cs" />
     <Compile Include="StructSizeTests.cs" />
+    <Compile Include="UnsafeStructsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -89,10 +89,12 @@ namespace ObjectLayoutInspector
         /// </summary>
         struct SizeComputer<T>
         {
-#pragma warning disable 169 Unused field
+#pragma warning disable 0649 // Unassigned field
+#pragma warning disable 169 // Unused field
             public T field1;
             public T field2;
-#pragma warning restore 169 Unused field
+#pragma warning restore 169 // Unused field
+#pragma warning restore 0649 // Unassigned field
         }
 
         /// <summary>

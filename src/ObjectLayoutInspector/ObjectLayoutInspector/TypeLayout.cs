@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using ObjectLayoutInspector.Helpers;
 
 namespace ObjectLayoutInspector
 {
@@ -37,14 +37,16 @@ namespace ObjectLayoutInspector
             Size = size;
             Overhead = overhead;
             Fields = fields;
-            var thisInstancePaddings = fields.OfType<Padding>().Sum(p => p.Size);
+            // We can't get padding information for unsafe struct.
+            // Assuming there is no one.
+            var thisInstancePaddings = type.IsUnsafeValueType() ? 0 : fields.OfType<Padding>().Sum(p => p.Size);
 
             // TODO: this can be expensive.
             var nestedPaddings = fields
                 // Skipping primitive types are recursive and they don't have any paddings.
                 .OfType<FieldLayout>().Where(fl => !fl.FieldInfo.FieldType.IsPrimitive).Select(fl => GetLayout(fl.FieldInfo.FieldType))
                 .Sum(tl => tl.Paddings);
-
+            
             Paddings = thisInstancePaddings + nestedPaddings;
         }
 
