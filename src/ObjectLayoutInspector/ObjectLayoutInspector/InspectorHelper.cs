@@ -72,81 +72,29 @@ namespace ObjectLayoutInspector
         }
 
         /// <summary>
+        /// Helper struct that is used for computing the size of a struct.
+        /// </summary>
+        struct SizeComputer<T>
+        {
+        #pragma warning disable 0649 // Unassigned field
+        #pragma warning disable 169 // Unused field
+            public T dummyField;
+            public int offset;
+        #pragma warning restore 169 // Unused field
+        #pragma warning restore 0649 // Unassigned field
+        }
+
+        /// <summary>
         /// Computes size for <paramref name="type"/>.
         /// </summary>
         public static int GetSizeOfValueTypeInstance(Type type)
         {
             Debug.Assert(type.IsValueType);
-            // Generate a struct with two fields of type 'type'
-            var generatedType = GenerateSizeComputerOf(type);
-            // The offset of the second field is the size of 'type'
+
+            var generatedType = typeof(SizeComputer<>).MakeGenericType(type);
+            // The offset of the second field is the size of the 'type'
             var fieldsOffsets = GetFieldOffsets(generatedType);
             return fieldsOffsets[1].offset;
-        }
-
-        /// <summary>
-        /// Helper struct that is used for computing the size of a struct.
-        /// </summary>
-        struct SizeComputer<T>
-        {
-#pragma warning disable 0649 // Unassigned field
-#pragma warning disable 169 // Unused field
-            public T field1;
-            public T field2;
-#pragma warning restore 169 // Unused field
-#pragma warning restore 0649 // Unassigned field
-        }
-
-        /// <summary>
-        /// Method "generates" a <code>SizeComputer&lt;FieldType&gt;</code> type at runtime.
-        /// </summary>
-        /// <remarks>
-        /// Instead of generating a real type using <see cref="ModuleBuilder"/> for defining a new type this function
-        /// generates a method that returns an empty instance of <code>SizeComputer&lt;FieldType&gt;</code>.
-        /// There is a security issue with <see cref="ModuleBuilder"/>. Generated type resides in a new assembly that doesn't have
-        /// a visibility to internal or private types and there is no way to work around this issue.
-        /// So instead of that we're relying on the CLR and a magic of generics to generate a closed generic type at runtime.
-        /// </remarks>
-        private static Type GenerateSizeComputerOf(Type fieldType)
-        {
-            var returnType = typeof(SizeComputer<>).MakeGenericType(fieldType);
-
-            var method = new DynamicMethod(
-                name: "GenerateTypeForSizeComputation",
-                returnType: typeof(object),
-                parameterTypes: new Type[0],
-                m: typeof(InspectorHelper).Module,
-                skipVisibility: true);
-
-            ILGenerator ilGen = method.GetILGenerator();
-
-            // This method generates the following function:
-            //object GenerateTypeForSizeComputation()
-            //{
-            //    SizeComputer<FieldType> l1 = default(SizeComputer<FieldType>);
-            //    object l2 = l1; // box the local
-            //    return l2;
-            //}
-
-            ilGen.DeclareLocal(returnType);
-            ilGen.DeclareLocal(typeof(object));
-
-            // SizeComputer<FieldType> l1 = default(SizeComputer<FieldType>);
-            ilGen.Emit(OpCodes.Ldloca_S, 0);
-            ilGen.Emit(OpCodes.Initobj, returnType);
-
-            // object l2 = l1; // box the local
-            ilGen.Emit(OpCodes.Ldloc_0);
-            ilGen.Emit(OpCodes.Box, returnType);
-            ilGen.Emit(OpCodes.Stloc_1);
-
-            // return l2;
-            ilGen.Emit(OpCodes.Ldloc_1);
-            ilGen.Emit(OpCodes.Ret);
-
-            var func = (Func<object>) method.CreateDelegate(typeof(Func<object>));
-            var result = func();
-            return result.GetType();
         }
 
         public static (FieldInfo fieldInfo, int offset)[] GetFieldOffsets<T>()
