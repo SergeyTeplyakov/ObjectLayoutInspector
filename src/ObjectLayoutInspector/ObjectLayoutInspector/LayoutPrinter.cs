@@ -17,23 +17,12 @@ namespace ObjectLayoutInspector
         /// </summary>
         public static void Print(Type type, bool recursively = true)
         {
-            Console.WriteLine($"Type layout for '{type.Name}'");
-
-            var layout = TypeLayout.GetLayout(type);
-            int emptiness = (layout.Paddings * 100) / layout.Size;
-            Console.WriteLine($"Size: {layout.Size} bytes. Paddings: {layout.Paddings} bytes (%{emptiness} of empty space)");
-
-            Console.WriteLine(LayoutAsString(type, recursively));
+            Print(TypeLayout.GetLayout(type), recursively);
         }
 
         public static void Print(TypeLayout layout, bool recursively = true)
         {
-            Console.WriteLine($"Type layout for '{layout.Type.Name}'");
-
-            int emptiness = (layout.Paddings * 100) / layout.Size;
-            Console.WriteLine($"Size: {layout.Size} bytes. Paddings: {layout.Paddings} bytes (%{emptiness} of empty space)");
-
-            Console.WriteLine(TypeLayoutAsString(layout, recursively));
+            Console.WriteLine(layout.ToString(recursively));
         }
 
         private static string LayoutAsString(Type type, bool recursively = true)
@@ -42,7 +31,7 @@ namespace ObjectLayoutInspector
             return TypeLayoutAsString(layout, recursively);
         }
 
-        private static string TypeLayoutAsString(TypeLayout layout, bool recursively = true)
+        public static string TypeLayoutAsString(TypeLayout layout, bool recursively = true)
         {
             var fieldAsStrings = new List<string>(layout.Fields.Length);
 

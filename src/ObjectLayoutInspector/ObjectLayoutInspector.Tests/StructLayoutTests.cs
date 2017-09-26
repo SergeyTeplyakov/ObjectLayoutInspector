@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using NUnit.Framework;
 
 namespace ObjectLayoutInspector.Tests
@@ -68,6 +69,24 @@ namespace ObjectLayoutInspector.Tests
         public void Print_ClrWillReorderThisStruct()
         {
             TypeLayout.PrintLayout<ClrWillReorderThisStruct>();
+        }
+
+        public struct WithVolatile
+        {
+            private object obj;
+            private int i1;
+            private int i2;
+        }
+
+        [Test]
+        public void Print_WithVolatile()
+        {
+            Console.WriteLine(Marshal.SizeOf<WithVolatile>());
+            
+            TypeLayout.PrintLayout<WithVolatile>();
+
+            var layout = TypeLayout.GetLayout<WithVolatile>();
+            Assert.That(layout.FullSize, Is.EqualTo(16));
         }
     }
 }

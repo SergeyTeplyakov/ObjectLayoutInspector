@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.Serialization;
 using ObjectLayoutInspector.Helpers;
 
 namespace ObjectLayoutInspector
@@ -76,12 +74,14 @@ namespace ObjectLayoutInspector
         /// </summary>
         struct SizeComputer<T>
         {
-        #pragma warning disable 0649 // Unassigned field
-        #pragma warning disable 169 // Unused field
+#pragma warning disable 0649 // Unassigned field
+#pragma warning disable 169 // Unused field
+            // Both fields should be of the same type because the CLR can rearrange the struct and 
+            // the offset of the second field would be the offset of the 'dummyField' not the offset of the 'offset' field.
             public T dummyField;
-            public int offset;
-        #pragma warning restore 169 // Unused field
-        #pragma warning restore 0649 // Unassigned field
+            public T offset;
+#pragma warning restore 169 // Unused field
+#pragma warning restore 0649 // Unassigned field
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using ObjectLayoutInspector.Helpers;
 
 namespace ObjectLayoutInspector
@@ -59,14 +60,26 @@ namespace ObjectLayoutInspector
             cache.LayoutCache.AddOrUpdate(type, this, (t, layout) => layout);
         }
 
-        public void PrintLayout()
-        {
-            LayoutPrinter.Print(this);
-        }
-
         public static void PrintLayout<T>(bool recursively = true)
         {
             LayoutPrinter.Print<T>(recursively);
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+            => ToString(recursively: true);
+
+        public string ToString(bool recursively)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"Type layout for '{Type.Name}'");
+
+            int emptiness = (Paddings * 100) / Size;
+            sb.AppendLine($"Size: {Size} bytes. Paddings: {Paddings} bytes (%{emptiness} of empty space)");
+
+            sb.AppendLine(LayoutPrinter.TypeLayoutAsString(this, recursively: recursively));
+
+            return sb.ToString();
         }
 
         public static TypeLayout? TryGetLayout(Type type, TypeLayoutCache cache)

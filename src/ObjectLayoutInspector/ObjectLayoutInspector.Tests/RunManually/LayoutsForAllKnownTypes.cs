@@ -40,14 +40,14 @@ namespace ObjectLayoutInspector.Tests.RunManually
             Console.WriteLine("Top 10 biggest types:");
             foreach (var t in top10BiggestInstances)
             {
-                t.PrintLayout();
+                Console.WriteLine(t);
             }
 
             Console.WriteLine();
             Console.WriteLine("Top 10 types with biggest paddings:");
             foreach (var t in top10WithBiggestPaddings)
             {
-                t.PrintLayout();
+                Console.WriteLine(t);
             }
         }
 
