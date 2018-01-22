@@ -65,6 +65,11 @@ namespace ObjectLayoutInspector
             LayoutPrinter.Print<T>(recursively);
         }
 
+        public static void PrintLayout(Type type, bool recursively = true)
+        {
+            LayoutPrinter.Print(type, recursively);
+        }
+
         /// <inheritdoc />
         public override string ToString()
             => ToString(recursively: true);
