@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace ObjectLayoutInspector.Tests
 {
     [StructLayout(LayoutKind.Explicit)]
-    public struct StructWithExplicitLayout
+    public class ClassWithExplicitLayout
     {
         [FieldOffset(0)]
         public byte m_byte1;
@@ -19,7 +19,7 @@ namespace ObjectLayoutInspector.Tests
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 100)]
-    public struct StructWithExplicitLayoutAndOffsetForFirstField
+    public class ClassWithExplicitLayoutAndOffsetForFirstField
     {
         [FieldOffset(10)]
         public byte m_byte1;
@@ -28,24 +28,18 @@ namespace ObjectLayoutInspector.Tests
     }
 
     [TestFixture]
-    public class StructWithExplicitLayoutTests
+    public class ClassWithExplicitLayoutTests
     {
-        [Test]
-        public void Print_NotAlignedStruct()
-        {
-            TypeLayout.PrintLayout<NotAlignedStruct>();
-        }
-
         [Test]
         public void Print_StructWithExplicitLayout()
         {
-            TypeLayout.PrintLayout<StructWithExplicitLayout>();
+            TypeLayout.PrintLayout<ClassWithExplicitLayout>();
         }
 
         [Test]
         public void Print_StructWithExplicitLayoutAndOffsetForFirstField()
         {
-            TypeLayout.PrintLayout<StructWithExplicitLayoutAndOffsetForFirstField>();
+            TypeLayout.PrintLayout<ClassWithExplicitLayoutAndOffsetForFirstField>();
         }
     }
 }
