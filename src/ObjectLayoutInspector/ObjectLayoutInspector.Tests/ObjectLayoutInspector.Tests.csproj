@@ -30,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
@@ -52,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClassLayoutTests.cs" />
+    <Compile Include="ClassWithExplicitLayoutTests.cs" />
     <Compile Include="ClassWithNestedStructPrinterTests.cs" />
     <Compile Include="ExcessivePaddings.cs" />
     <Compile Include="InstanceSizeTests.cs" />

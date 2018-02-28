@@ -119,18 +119,20 @@ namespace ObjectLayoutInspector
 
             var addresses = fieldOffsetInspector(instance);
 
-            if (addresses.Length == 0)
+            if (addresses.Length <= 1)
             {
                 return Array.Empty<(FieldInfo, int)>();
             }
 
-            var baseLine = addresses.Min();
+            var baseLine = GetBaseLine(addresses[0]);
             
             // Converting field addresses to offsets using the first field as a baseline
             return fields
-                .Select((field, index) => (field: field, offset: (int)(addresses[index] - baseLine)))
+                .Select((field, index) => (field: field, offset: (int)(addresses[index + 1] - baseLine)))
                 .OrderBy(tpl => tpl.offset)
                 .ToArray();
+
+            long GetBaseLine(long referenceAddress) => t.IsValueType ? referenceAddress : referenceAddress + IntPtr.Size;
         }
 
         private static Func<object, long[]> GenerateFieldOffsetInspectionFunction(FieldInfo[] fields)
@@ -147,11 +149,26 @@ namespace ObjectLayoutInspector
             // Declaring local variable of type long[]
             ilGen.DeclareLocal(typeof(long[]));
             // Loading array size onto evaluation stack
-            ilGen.Emit(OpCodes.Ldc_I4, fields.Length);
+            ilGen.Emit(OpCodes.Ldc_I4, fields.Length + 1);
 
             // Creating an array and storing it into the local
             ilGen.Emit(OpCodes.Newarr, typeof(long));
             ilGen.Emit(OpCodes.Stloc_0);
+
+            // Loading the local with an array
+            ilGen.Emit(OpCodes.Ldloc_0);
+
+            // Loading an index of the array where we're going to store the element
+            ilGen.Emit(OpCodes.Ldc_I4, 0);
+
+            // Loading object instance onto evaluation stack
+            ilGen.Emit(OpCodes.Ldarg_0);
+
+            // Converting reference to long
+            ilGen.Emit(OpCodes.Conv_I8);
+
+            // Storing the reference in the array
+            ilGen.Emit(OpCodes.Stelem_I8);
 
             for (int i = 0; i < fields.Length; i++)
             {
@@ -159,7 +176,7 @@ namespace ObjectLayoutInspector
                 ilGen.Emit(OpCodes.Ldloc_0);
 
                 // Loading an index of the array where we're going to store the element
-                ilGen.Emit(OpCodes.Ldc_I4, i);
+                ilGen.Emit(OpCodes.Ldc_I4, i + 1);
 
                 // Loading object instance onto evaluation stack
                 ilGen.Emit(OpCodes.Ldarg_0);

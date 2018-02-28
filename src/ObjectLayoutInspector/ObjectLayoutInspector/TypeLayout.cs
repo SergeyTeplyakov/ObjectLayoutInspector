@@ -128,6 +128,11 @@ namespace ObjectLayoutInspector
                 var fieldsOffsets = InspectorHelper.GetFieldOffsets(type);
                 var fields = new List<FieldLayoutBase>();
 
+                if (includePaddings && fieldsOffsets.Length != 0 && fieldsOffsets[0].offset != 0)
+                {
+                    fields.Add(new Padding(fieldsOffsets[0].offset, 0));
+                }
+
                 for (var index = 0; index < fieldsOffsets.Length; index++)
                 {
                     var fieldOffset = fieldsOffsets[index];
