@@ -96,7 +96,9 @@ namespace ObjectLayoutInspector.Helpers
                 return false;
             }
 
-            if (t == typeof(ArgIterator) || t == typeof(RuntimeArgumentHandle) || t == typeof(TypedReference) || t.Name == "Void"
+            // TODO: check where ArgIterator is located
+            if (// t == typeof(ArgIterator) || 
+                t == typeof(RuntimeArgumentHandle) || t == typeof(TypedReference) || t.Name == "Void"
                 || t == typeof(IsVolatile) || t == typeof(RuntimeFieldHandle) || t == typeof(RuntimeMethodHandle) ||
                 t == typeof(RuntimeTypeHandle))
             {

@@ -21,7 +21,18 @@ namespace ObjectLayoutInspector.Tests.RunManually
 #pragma warning restore 0649 // Unassigned field
         }
 
+        struct Test1 { byte b; double d; byte b2; double d2; byte b3; }
+
+        struct Test2 { double d; double d2; byte b; byte b2; byte b3; }
+
         [Test]
+        public void GetLayoutForTwoSpecificTypes()
+        {
+            TypeLayout.PrintLayout(typeof(Test1));
+            TypeLayout.PrintLayout(typeof(Test2));
+        }
+
+        //[Test]
         public void GetLayoutsForAllTypes()
         {
             //var xx = new SizeComputer<RSAOAEPKeyExchangeDeformatter>();
