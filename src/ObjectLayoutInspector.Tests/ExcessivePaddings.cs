@@ -9,10 +9,7 @@ namespace ObjectLayoutInspector.Tests
 #if UseAlias
     using ByteWrapper = System.Byte;
 #else
-    internal struct ByteWrapper
-    {
-        public byte b;
-    }
+    
 #endif
 
     [TestFixture]
@@ -33,7 +30,12 @@ namespace ObjectLayoutInspector.Tests
             Assert.That(TypeLayout.GetLayout<StructMultipleByteWrappers>().Size, Is.EqualTo(3));
         }
 
-        [StructLayout(LayoutKind.Auto)]
+        internal struct ByteWrapper
+        {
+            public byte b;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
         internal class StructWithAutomaticLayout
         {
             public ByteWrapper bw1;
@@ -41,12 +43,19 @@ namespace ObjectLayoutInspector.Tests
             public ByteWrapper bw3;
         }
 
+        internal struct Slot<T>
+        {
+            internal int hashCode;      // Lower 31 bits of hash code, -1 if unused
+            internal T value;
+            internal int next;          // Index of next entry, -1 if last
+        }
+
         [Test]
         public void PrintClassMultipleByteWrappersLayout()
         {
             // In this case every field aligned on the pointer boundaries
-            TypeLayout.PrintLayout<StructWithAutomaticLayout>();
-            Assert.That(TypeLayout.GetLayout<StructWithAutomaticLayout>().Size, Is.EqualTo(24));
+            TypeLayout.PrintLayout<Slot<long>>();
+            //Assert.That(TypeLayout.GetLayout<Slot>().Size, Is.EqualTo(24));
         }
     }
 }
