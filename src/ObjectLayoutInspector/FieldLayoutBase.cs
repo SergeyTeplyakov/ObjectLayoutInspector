@@ -8,10 +8,10 @@ namespace ObjectLayoutInspector
         public int Padding { get; }
         public int Offset { get; }
 
-        protected FieldLayoutBase(int size, int offset)
+        protected FieldLayoutBase(int offset, int size)
         {
-            Size = size;
             Offset = offset;
+            Size = size;
         }
 
         public override string ToString()
@@ -34,7 +34,13 @@ namespace ObjectLayoutInspector
     public sealed class FieldLayout : FieldLayoutBase
     {
         public FieldLayout(int offset, FieldInfo fieldInfo)
-            : base(InspectorHelper.GetFieldSize(fieldInfo.FieldType), offset)
+            : base(offset, InspectorHelper.GetFieldSize(fieldInfo.FieldType))
+        {
+            FieldInfo = fieldInfo;
+        }
+        
+        public FieldLayout(int offset, FieldInfo fieldInfo, int size)
+            : base(offset, size)
         {
             FieldInfo = fieldInfo;
         }
@@ -47,7 +53,7 @@ namespace ObjectLayoutInspector
 
     public sealed class Padding : FieldLayoutBase
     {
-        public Padding(int size, int offset) : base(size, offset)
+        public Padding(int offset, int size) : base(offset, size)
         {
         }
 

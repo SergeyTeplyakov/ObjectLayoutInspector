@@ -130,7 +130,7 @@ namespace ObjectLayoutInspector
 
                 if (includePaddings && fieldsOffsets.Length != 0 && fieldsOffsets[0].offset != 0)
                 {
-                    fields.Add(new Padding(fieldsOffsets[0].offset, 0));
+                    fields.Add(new Padding(0, fieldsOffsets[0].offset));
                 }
 
                 for (var index = 0; index < fieldsOffsets.Length; index++)
@@ -152,7 +152,7 @@ namespace ObjectLayoutInspector
                         if (nextSectionOffsetCandidate < nextOffsetOrSize)
                         {
                             // we have padding
-                            fields.Add(new Padding(nextOffsetOrSize - nextSectionOffsetCandidate, nextSectionOffsetCandidate));
+                            fields.Add(new Padding(nextSectionOffsetCandidate, nextOffsetOrSize - nextSectionOffsetCandidate));
                         }
                     }
                 }

@@ -6,19 +6,17 @@ namespace ObjectLayoutInspector.Tests
     [TestFixture]
     public class InstanceSizeTests
     {
-        class Empty { }
-
         [Test]
         public void SizeForEmptyClassIs3PtrSizes()
         {
-            var layout = TypeLayout.GetLayout<Empty>();
+            var layout = TypeLayout.GetLayout<ClassEmpty>();
             Assert.That(layout.FullSize, Is.EqualTo(IntPtr.Size * 3));
         }
 
         [Test]
         public void NoFieldsForEmptyClass()
         {
-            var layout = TypeLayout.GetLayout<Empty>();
+            var layout = TypeLayout.GetLayout<ClassEmpty>();
             Assert.That(layout.Fields, Is.Empty);
         }
     }

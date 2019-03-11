@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2027
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectLayoutInspector", "ObjectLayoutInspector\ObjectLayoutInspector.csproj", "{D89F0520-ED92-4413-BCB2-5365C13447EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectLayoutInspector", "src\ObjectLayoutInspector\ObjectLayoutInspector.csproj", "{D89F0520-ED92-4413-BCB2-5365C13447EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectLayoutInspector.Tests", "ObjectLayoutInspector.Tests\ObjectLayoutInspector.Tests.csproj", "{D796C001-E20E-4019-A56B-1A3BE214A281}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectLayoutInspector.Tests", "src\ObjectLayoutInspector.Tests\ObjectLayoutInspector.Tests.csproj", "{D796C001-E20E-4019-A56B-1A3BE214A281}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

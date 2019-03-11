@@ -5,11 +5,6 @@ using NUnit.Framework.Internal;
 
 namespace ObjectLayoutInspector.Tests
 {
-    [StructLayout(LayoutKind.Sequential, Size = 42)]
-    struct MyStruct
-    {
-        
-    }
 
     [TestFixture]
     public class StructSizeTests

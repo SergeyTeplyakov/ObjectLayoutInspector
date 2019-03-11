@@ -1,36 +1,34 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using System.Runtime.CompilerServices;
+using NUnit.Framework;
 
 namespace ObjectLayoutInspector.Tests
 {
+
     [TestFixture]
     public class PaddingTests
     {
-        unsafe struct FixedBytes
-        {
-            public const int MaxLength = 33;
-            private fixed byte _bytes[MaxLength];
-        }
-
-        struct WithNestedUnsafeStruct
-        {
-            private FixedBytes fb;
-        }
-
         [Test]
         public void UnsafeStructHasEmptyPaddings()
         {
-            var typeLayout = TypeLayout.GetLayout<WithNestedUnsafeStruct>();
-            Assert.That(typeLayout.Paddings, Is.EqualTo(0));
-        }
+            var typeLayout = TypeLayout.GetLayout<WithNestedUnsafeStruct>(includePaddings: true);
+            var structLayout = UnsafeLayout.GetLayout<WithNestedUnsafeStruct>();
+            Assert.AreEqual(Unsafe.SizeOf<WithNestedUnsafeStruct>(), typeLayout.Size);
+            var typeLayoutFields = typeLayout.Fields;
+            Assert.AreEqual(typeLayoutFields.Count(), structLayout.Count());
 
-        struct WithString
-        {
-            string s;
+            Assert.That(typeLayout.Paddings, Is.EqualTo(0));
         }
 
         [Test]
         public void LayoutForInstanceWithStringShouldNotCrash()
         {
+            var structLayout = UnsafeLayout.GetLayout<WithString>();
+            var typeLayout = TypeLayout.GetLayout<WithString>(includePaddings: true);
+            Assert.AreEqual(Unsafe.SizeOf<WithString>(), typeLayout.Size);
+            var typeLayoutFields = typeLayout.Fields;
+            Assert.AreEqual(typeLayoutFields.Count(), structLayout.Count());
+
             // I know, I know. This is bad to name tests like this. But this is life:)
             var layout = TypeLayout.GetLayout<WithString>();
             Assert.That(layout.Fields.Length, Is.EqualTo(1));
