@@ -90,15 +90,19 @@ namespace ObjectLayoutInspector
 
             return fieldsAndPaddings;
         }
-
+        public struct nullable<T> where T : struct
+        {
+            private bool a;
+            private T b;
+        }
         private static void GetLayout<T>(
-            ref int previousOffset,
-            List<Type> typeHierarchy,
-            List<FieldInfo> fieldsHierarchy,
-            List<FieldLayout> fieldsLayout,
-            bool recursive,
-            IReadOnlyCollection<Type> primitives)
-            where T : struct
+           ref int previousOffset,
+           List<Type> typeHierarchy,
+           List<FieldInfo> fieldsHierarchy,
+           List<FieldLayout> fieldsLayout,
+           bool recursive,
+           IReadOnlyCollection<Type> primitives)
+           where T : struct
         {
             var fields = ReflectionHelper.GetInstanceFields(typeHierarchy.Last());
 
@@ -106,18 +110,18 @@ namespace ObjectLayoutInspector
             {
                 FieldInfo field = fields[i];
                 var fieldType = field.FieldType;
-                (Type, int) fixedData = default;
-                if (IsPrimitive(fieldType) || (primitives?.Contains(fieldType) == true) || !fieldType.IsValueType || IsFixed(field, out fixedData) || !recursive)
+                int? fixedData = null;
+                if (IsPrimitive(fieldType)
+                    || (primitives?.Contains(fieldType) == true)
+                    || !fieldType.IsValueType
+                    || IsFixed(field, out fixedData)
+                    || IsNullable(fieldType)
+                    || !recursive)
                 {
                     fieldsHierarchy.Add(field);
 
-                    var realStructOffset = FindOffset<T>(fieldsHierarchy);
+                    var (realStructOffset, size) = FindOffset<T>(fieldsHierarchy, fixedData);
                     fieldsHierarchy.RemoveAt(fieldsHierarchy.Count - 1);
-
-                    var size = fieldType.IsEnum ? Marshal.SizeOf(fieldType.GetEnumUnderlyingType())
-                              : !fieldType.IsValueType ? Unsafe.SizeOf<IntPtr>()
-                              : fixedData.Item1 != null ? Marshal.SizeOf(fixedData.Item1) * fixedData.Item2
-                              : Marshal.SizeOf(fieldType);
                     var fieldLayout = new FieldLayout(realStructOffset, field, size);
                     previousOffset = realStructOffset + size;
                     fieldsLayout.Add(fieldLayout);
@@ -133,7 +137,10 @@ namespace ObjectLayoutInspector
             }
         }
 
-        private static bool IsFixed(FieldInfo fieldInfo, out (Type, int) fixedBuffer)
+        private static bool IsNullable(Type t) =>
+            t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>);
+
+        private static bool IsFixed(FieldInfo fieldInfo, out int? fixedBuffer)
         {
             var fixedCheck = fieldInfo
                              .CustomAttributes.Where(x => x.AttributeType.Equals(typeof(FixedBufferAttribute)))
@@ -141,11 +148,11 @@ namespace ObjectLayoutInspector
                              .FirstOrDefault();
             if (fixedCheck != null)
             {
-                fixedBuffer = ((Type)fixedCheck[0].Value, (int)fixedCheck[1].Value);
+                fixedBuffer = (int)fixedCheck[1].Value;
                 return true;
             }
 
-            fixedBuffer = default;
+            fixedBuffer = null;
             return false;
         }
 
@@ -155,41 +162,57 @@ namespace ObjectLayoutInspector
         // we support structs of all layout with overlapping, so start from zero each time
         // may split sequential layout and overlapped to improve performance if needed
         //
-        // next could support classes (not sure if will work with non blittable)
+        // cannot use Marshal.SizeOf as does not works with generics and for (bool, bool) gives 8, not 2   
+        //
+        // next could support classes (how to get Unsafe into heap of object fields porable?)
         // https://stackoverflow.com/questions/18937935/how-to-mutate-a-boxed-struct-using-il
         //
-        // next could work in unity if unsafe-marshal fails to work (non portable)
-        // https://docs.unity3d.com/2018.3/Documentation/ScriptReference/Unity.Collections.LowLevel.Unsafe.UnsafeUtility.html        
-        private static int FindOffset<T>(List<FieldInfo> fieldsHierarchy)
+        // next could work in unity if unsafe fails to work (non portable)
+        // https://docs.unity3d.com/2018.3/Documentation/ScriptReference/Unity.Collections.LowLevel.Unsafe.UnsafeUtility.html  
+        //   
+        private static (int, int) FindOffset<T>(List<FieldInfo> fieldsHierarchy, int? fixedData)
             where T : struct
         {
+            var endFieldType = fieldsHierarchy.Last().FieldType;
             T dummy = default;
             ref var dummyRef = ref Unsafe.As<T, byte>(ref dummy);
             var size = Unsafe.SizeOf<T>();
-            Zero(ref dummyRef, size);
+            var offset = -1;
+            var fieldSize = -1;
             for (int i = 0; i < size; i++)
             {
-                var endFieldType = fieldsHierarchy.Last().FieldType;
+                Unsafe.InitBlock(ref Unsafe.As<T, byte>(ref dummy), 0, (uint)size);
                 if (endFieldType.IsValueType)
                 {
                     var empty = Activator.CreateInstance(endFieldType);
                     dummyRef = byte.MaxValue;
-                    object value2 = GetValue(fieldsHierarchy, dummy);
-                    if (!empty.Equals(value2))
-                        return i;
+                    object modifiedValue = GetValue(fieldsHierarchy, dummy);
+                    if (!empty.Equals(modifiedValue) && offset < 0)
+                        offset = i;
+
+                    if (offset >= 0)
+                        if (!empty.Equals(modifiedValue) || (fieldSize < 0 && size == i + 1))
+                            fieldSize = i + 1 - offset;
                 }
                 else
                 {
                     dummyRef = byte.MaxValue;
                     object value2 = GetValue(fieldsHierarchy, dummy);
                     if (value2 != null)
-                        return i;
+                        return (i, Unsafe.SizeOf<IntPtr>());
                 }
 
                 dummyRef = ref Unsafe.Add(ref dummyRef, 1);
             }
 
-            throw new InvalidOperationException("Cannot happen");
+            if (offset >= 0 && fieldSize >= 0)
+            {
+                if (fixedData.HasValue)
+                    return (offset, fieldSize * fixedData.Value);
+                return (offset, fieldSize);
+            }
+
+            throw new NotImplementedException($"Failed to find offset and size of {endFieldType.FullName} in {typeof(T).FullName}");
         }
 
         private static object GetValue<T>(List<FieldInfo> fieldsHierarchy, T rootDummy) where T : struct
@@ -202,17 +225,6 @@ namespace ObjectLayoutInspector
             }
 
             return value;
-        }
-
-
-        // paddings are not zeroed and need to pad after each iteration of searchin offset
-        private static void Zero(ref byte dummyByte, int size)
-        {
-            for (int i = 0; i < size; i++)
-            {
-                dummyByte = 0;
-                Unsafe.Add(ref dummyByte, 1);
-            }
         }
     }
 }

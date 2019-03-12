@@ -85,14 +85,17 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void GetFieldsLayoutFloatFloatStruct()
         {
+            TypeLayout.PrintLayout<FloatFloatStruct>();
             var structLayout = UnsafeLayout.GetFieldsLayout<FloatFloatStruct>();
-            Assert.AreEqual(2, structLayout.Count());
-            Assert.AreEqual(0, structLayout[0].Offset);
-            Assert.AreEqual(4, structLayout[0].Size);
+            var typeLayout = TypeLayout.GetLayout<FloatFloatStruct>(includePaddings: false).Fields;
+            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
+            Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
+            Assert.AreEqual(typeLayout[0].Size, structLayout[0].Size);
             Assert.AreEqual(typeof(float), structLayout[0].FieldInfo.FieldType);
-            Assert.AreEqual(4, structLayout[1].Offset);
-            Assert.AreEqual(4, structLayout[1].Size);
+            Assert.AreEqual(typeLayout[1].Offset, structLayout[1].Offset);
+            Assert.AreEqual(typeLayout[1].Size, structLayout[1].Size);
             Assert.AreEqual(typeof(float), structLayout[1].FieldInfo.FieldType);
+
         }
 
 
@@ -207,6 +210,18 @@ namespace ObjectLayoutInspector.Tests
             var structLayout = UnsafeLayout.GetLayout<ExplicitLayoutNoOverlapStruct>();
             var typeLayout = TypeLayout.GetLayout<ExplicitLayoutNoOverlapStruct>(includePaddings: true).Fields;
             Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-        }   
+        }
+
+        [Test]
+        public void BoolBoolStruct()
+        {
+            var structLayout = UnsafeLayout.GetLayout<BoolBoolStruct>();
+            var typeLayout = TypeLayout.GetLayout<BoolBoolStruct>(includePaddings: true).Fields;
+            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
+            Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
+            Assert.AreEqual(typeLayout[0].Size, structLayout[0].Size);
+            Assert.AreEqual(typeLayout[1].Offset, structLayout[1].Offset);
+            Assert.AreEqual(typeLayout[1].Size, structLayout[1].Size);
+        }
     }
 }
