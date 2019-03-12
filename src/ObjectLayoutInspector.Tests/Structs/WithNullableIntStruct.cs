@@ -4,9 +4,4 @@
     {
         int? one;
     }
-
-    struct WithNullableBoolBoolStructStruct
-    {
-        BoolBoolStruct? one;
-    }    
 }
