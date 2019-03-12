@@ -65,5 +65,14 @@ namespace ObjectLayoutInspector.Tests
             var structLayout = UnsafeLayout.GetLayout<TimeSpan>();
             Assert.AreEqual(typeLayout.Fields.Count(), structLayout.Count());
         }
+
+        [Test]
+        public void Tuple()
+        {
+            TypeLayout.PrintLayout<(bool, int, float)>();
+            var typeLayout = TypeLayout.GetLayout<(bool, int, float)>(includePaddings: true);
+            var structLayout = UnsafeLayout.GetLayout<(bool, int, float)>();
+            Assert.AreEqual(typeLayout.Fields.Count(), structLayout.Count());
+        }        
     }
 }

@@ -223,5 +223,22 @@ namespace ObjectLayoutInspector.Tests
             Assert.AreEqual(typeLayout[1].Offset, structLayout[1].Offset);
             Assert.AreEqual(typeLayout[1].Size, structLayout[1].Size);
         }
+
+        [Test]
+        public void MASTER_STRUCT()
+        {
+            var structLayout = UnsafeLayout.GetLayout<MASTER_STRUCT>(recursive:false);
+            var typeLayout = TypeLayout.GetLayout<MASTER_STRUCT>(includePaddings: true).Fields;
+            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
+            Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
+            Assert.AreEqual(typeLayout[0].Size, structLayout[0].Size);
+        }        
+
+        [Test]
+        public void MASTER_STRUCTFieldsRecursive()
+        {
+            var structLayout = UnsafeLayout.GetLayout<MASTER_STRUCT>(recursive:true, new List<Type>{typeof(Guid)});
+            Assert.AreEqual(6, structLayout.Count());            
+        }        
     }
 }
