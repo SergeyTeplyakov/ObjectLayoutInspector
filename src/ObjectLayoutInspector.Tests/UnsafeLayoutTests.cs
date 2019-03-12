@@ -11,9 +11,9 @@ namespace ObjectLayoutInspector.Tests
     public class UnsafeLayoutTests
     {
         [Test]
-        public void GetFieldLayoutLongByte()
+        public void GetFieldsLayoutLongByte()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<LongByteStruct>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<LongByteStruct>();
             var typeLayout = TypeLayout.GetLayout<LongByteStruct>(includePaddings: false).Fields;
             Assert.AreEqual(typeLayout.Count(), structLayout.Count());
             Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
@@ -39,9 +39,9 @@ namespace ObjectLayoutInspector.Tests
         }
 
         [Test]
-        public void GetFieldLayoutEnumIntStruct()
+        public void GetFieldsLayoutEnumIntStruct()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<EnumIntStruct>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<EnumIntStruct>();
             var typeLayout = TypeLayout.GetLayout<EnumIntStruct>(includePaddings: false).Fields;
             Assert.AreEqual(typeLayout.Count(), structLayout.Count());
             Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
@@ -66,9 +66,9 @@ namespace ObjectLayoutInspector.Tests
         }
 
         [Test]
-        public void GetFieldLayoutFloatFloatFloatStruct()
+        public void GetFieldsLayoutFloatFloatFloatStruct()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<FloatFloatFloatStruct>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<FloatFloatFloatStruct>();
             var typeLayout = TypeLayout.GetLayout<FloatFloatFloatStruct>(includePaddings: false).Fields;
             Assert.AreEqual(typeLayout.Count(), structLayout.Count());
             Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
@@ -83,9 +83,9 @@ namespace ObjectLayoutInspector.Tests
         }
 
         [Test]
-        public void GetFieldLayoutFloatFloatStruct()
+        public void GetFieldsLayoutFloatFloatStruct()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<FloatFloatStruct>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<FloatFloatStruct>();
             Assert.AreEqual(2, structLayout.Count());
             Assert.AreEqual(0, structLayout[0].Offset);
             Assert.AreEqual(4, structLayout[0].Size);
@@ -99,17 +99,17 @@ namespace ObjectLayoutInspector.Tests
 
 
         [Test]
-        public void GetFieldLayoutStructsNonRecursive()
+        public void GetFieldsLayoutStructsNonRecursive()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<ComplexStruct>(recursive: false);
+            var structLayout = UnsafeLayout.GetFieldsLayout<ComplexStruct>(recursive: false);
             var typeLayout = TypeLayout.GetLayout<ComplexStruct>(includePaddings: false).Fields;
             Assert.AreEqual(typeLayout.Count(), structLayout.Count());
         }
 
         [Test]
-        public void GetFieldLayoutStructs()
+        public void GetFieldsLayoutStructs()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<ComplexStruct>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<ComplexStruct>();
             Assert.AreEqual(4, structLayout.Count());
             Assert.AreEqual(0, structLayout[0].Offset);
             Assert.AreEqual(8, structLayout[1].Offset);
@@ -118,9 +118,9 @@ namespace ObjectLayoutInspector.Tests
         }
 
         [Test]
-        public void GetFieldLayoutDoubleFloatStruct()
+        public void GetFieldsLayoutDoubleFloatStruct()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<DoubleFloatStruct>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<DoubleFloatStruct>();
             Assert.AreEqual(2, structLayout.Count(), 2);
             Assert.AreEqual(0, structLayout[0].Offset, 0);
             Assert.AreEqual(8, structLayout[0].Size, 8);
@@ -131,30 +131,30 @@ namespace ObjectLayoutInspector.Tests
         }
 
         [Test]
-        public void GetFieldLayoutByteEnum()
+        public void GetFieldsLayoutByteEnum()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<ByteEnum>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<ByteEnum>();
             Assert.AreEqual(0, structLayout.Count());
         }
 
         [Test]
-        public void GetFieldLayoutByte()
+        public void GetFieldsLayoutByte()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<byte>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<byte>();
             Assert.AreEqual(0, structLayout.Count());
         }
 
         [Test]
-        public void GetFieldLayoutZero()
+        public void GetFieldsLayoutZero()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<EmptyStruct>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<EmptyStruct>();
             Assert.AreEqual(0, structLayout.Count());
         }
 
         [Test]
-        public void GetFieldLayoutByteEnumStruct()
+        public void GetFieldsLayoutByteEnumStruct()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<EnumStruct>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<EnumStruct>();
             Assert.AreEqual(1, structLayout.Count());
             Assert.AreEqual(0, structLayout[0].Offset);
             Assert.AreEqual(1, structLayout[0].Size);
@@ -164,7 +164,7 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void UnionStruct()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<UnionStruct>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<UnionStruct>();
             var typeLayout = TypeLayout.GetLayout<UnionStruct>(includePaddings: false).Fields;
             Assert.AreEqual(typeLayout.Count(), structLayout.Count());
         }
@@ -180,7 +180,7 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void ExplicitLayoutOverlapStruct()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<ExplicitLayoutOverlapStruct>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<ExplicitLayoutOverlapStruct>();
             var typeLayout = TypeLayout.GetLayout<ExplicitLayoutOverlapStruct>(includePaddings: false).Fields;
             Assert.AreEqual(typeLayout.Count(), structLayout.Count());
         }
@@ -196,7 +196,7 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void ExplicitLayoutNoOverlapStruct()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<ExplicitLayoutNoOverlapStruct>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<ExplicitLayoutNoOverlapStruct>();
             var typeLayout = TypeLayout.GetLayout<ExplicitLayoutNoOverlapStruct>(includePaddings: false).Fields;
             Assert.AreEqual(typeLayout.Count(), structLayout.Count());
         }
@@ -220,7 +220,7 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void ComplexComplex()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<System.Numerics.Complex>();
+            var structLayout = UnsafeLayout.GetFieldsLayout<System.Numerics.Complex>();
             var typeLayout = TypeLayout.GetLayout<System.Numerics.Complex>(includePaddings: false).Fields;
             Assert.AreEqual(typeLayout.Count(), structLayout.Count());
             Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
@@ -232,7 +232,7 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void ComplexInsideAsPrimitive()
         {
-            var structLayout = UnsafeLayout.GetFieldLayout<CustomPrimitive>(primitives: new HashSet<Type> { typeof(Complex) });
+            var structLayout = UnsafeLayout.GetFieldsLayout<CustomPrimitive>(primitives: new HashSet<Type> { typeof(Complex) });
             Assert.AreEqual(1, structLayout.Count());
             Assert.AreEqual(0, structLayout[0].Offset);
             Assert.AreEqual(16, structLayout[0].Size);
@@ -242,7 +242,7 @@ namespace ObjectLayoutInspector.Tests
         public void Vector2AsPrimitive()
         {
             TypeLayout.PrintLayout<Vector2>();
-            var structLayout = UnsafeLayout.GetFieldLayout<Vector2>(primitives: new HashSet<Type> { typeof(Vector2) });
+            var structLayout = UnsafeLayout.GetFieldsLayout<Vector2>(primitives: new HashSet<Type> { typeof(Vector2) });
             Assert.AreEqual(0, structLayout.Count());            
         }
     }
