@@ -8,19 +8,10 @@ using NUnit.Framework.Internal;
 namespace ObjectLayoutInspector.Tests
 {
     [TestFixture]
-    public class CorefxTypesTests
+    public class CorefxTypesTests : TestsBase
     {
         [Test]
-        public void ComplexComplex()
-        {
-            var structLayout = UnsafeLayout.GetFieldsLayout<System.Numerics.Complex>();
-            var typeLayout = TypeLayout.GetLayout<System.Numerics.Complex>(includePaddings: false).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-            Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
-            Assert.AreEqual(typeLayout[0].Size, structLayout[0].Size);
-            Assert.AreEqual(typeLayout[1].Offset, structLayout[1].Offset);
-            Assert.AreEqual(typeLayout[1].Size, structLayout[1].Size);
-        }
+        public void ComplexComplex() => AssertNonRecursive<System.Numerics.Complex>();
 
         [Test]
         public void ComplexInsideAsPrimitive()
@@ -43,36 +34,28 @@ namespace ObjectLayoutInspector.Tests
         public void DateTimeOffset()
         {
             TypeLayout.PrintLayout<DateTimeOffset>();
-            var typeLayout = TypeLayout.GetLayout<DateTimeOffset>(includePaddings: true);
-            var structLayout = UnsafeLayout.GetLayout<DateTimeOffset>();
-            Assert.AreEqual(typeLayout.Fields.Count(), structLayout.Count());
+            AssertNonRecursiveWithPadding<DateTimeOffset>();
         }
 
         [Test]
         public void DateTime()
         {
             TypeLayout.PrintLayout<DateTime>();
-            var typeLayout = TypeLayout.GetLayout<DateTime>(includePaddings: true);
-            var structLayout = UnsafeLayout.GetLayout<DateTime>();
-            Assert.AreEqual(typeLayout.Fields.Count(), structLayout.Count());
+            AssertNonRecursiveWithPadding<DateTime>();
         }
 
         [Test]
         public void TimeSpan()
         {
             TypeLayout.PrintLayout<TimeSpan>();
-            var typeLayout = TypeLayout.GetLayout<TimeSpan>(includePaddings: true);
-            var structLayout = UnsafeLayout.GetLayout<TimeSpan>();
-            Assert.AreEqual(typeLayout.Fields.Count(), structLayout.Count());
+            AssertNonRecursiveWithPadding<TimeSpan>();
         }
 
         [Test]
         public void Tuple()
         {
             TypeLayout.PrintLayout<(bool, int, float)>();
-            var typeLayout = TypeLayout.GetLayout<(bool, int, float)>(includePaddings: true);
-            var structLayout = UnsafeLayout.GetLayout<(bool, int, float)>();
-            Assert.AreEqual(typeLayout.Fields.Count(), structLayout.Count());
-        }        
+            AssertNonRecursiveWithPadding<(bool, int, float)>();
+        }
     }
 }

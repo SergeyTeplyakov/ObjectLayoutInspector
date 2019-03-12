@@ -61,7 +61,9 @@ namespace ObjectLayoutInspector
                 var lastOffset = last?.Offset + last?.Size ?? 0;
                 var paddingSize = head.Offset - lastOffset;
                 if (paddingSize > 0)
+                {
                     fieldsAndPaddings.Add(new Padding(lastOffset, paddingSize));
+                }
 
                 fieldsAndPaddings.Add(head);
                 ordered.RemoveAt(0);
@@ -79,22 +81,23 @@ namespace ObjectLayoutInspector
                         ordered.RemoveAt(0);
                         head = second;
                     }
-                    else break;
+                    else
+                    {
+                        break;
+                    }
                 }
             }
 
             var lastByte = fieldsAndPaddings.Max(x => x.Offset + x.Size);
             var ending = Unsafe.SizeOf<T>() - lastByte;
             if (ending > 0)
+            {
                 fieldsAndPaddings.Add(new Padding(lastByte, ending));
+            }
 
             return fieldsAndPaddings;
         }
-        public struct nullable<T> where T : struct
-        {
-            private bool a;
-            private T b;
-        }
+
         private static void GetLayout<T>(
            ref int previousOffset,
            List<Type> typeHierarchy,
@@ -153,16 +156,6 @@ namespace ObjectLayoutInspector
             return false;
         }
 
-
-        // must be of same layout as Nullable<T>
-
-        [Serializable]
-        private struct NullableLayout<T> where T : struct
-        {
-            private readonly bool hasValue; // Do not rename (binary serialization)
-            internal T value;
-        }
-
         private static bool IsPrimitive(Type componentType) =>
             componentType.IsPrimitive || componentType.IsEnum || componentType == typeof(decimal);
 
@@ -189,31 +182,33 @@ namespace ObjectLayoutInspector
         {
             var fieldInfo = fieldsHierarchy.Last();
             var endFieldType = fieldInfo.FieldType;
-            T dummy = default;
-            ref var dummyRef = ref Unsafe.As<T, byte>(ref dummy);
+            T seed = default;
+            ref var seedByteRef = ref Unsafe.As<T, byte>(ref seed);
             var size = Unsafe.SizeOf<T>();
             var offset = -1;
             var fieldSize = -1;
             for (int i = 0; i < size; i++)
             {
-                Unsafe.InitBlock(ref Unsafe.As<T, byte>(ref dummy), 0, (uint)size); // zero, including paddings
+                Unsafe.InitBlock(ref Unsafe.As<T, byte>(ref seed), 0, (uint)size); // zero, including paddings
                 if (endFieldType.IsValueType && IsNullable(endFieldType))
                 {
                     if (offset >= 0)
                     {
-                        ref var hasValue = ref Unsafe.Add(ref Unsafe.As<T, byte>(ref dummy), offset);
+                        ref var hasValue = ref Unsafe.Add(ref Unsafe.As<T, byte>(ref seed), offset);
                         hasValue = 1;
-                        dummyRef = byte.MaxValue;
+                        seedByteRef = byte.MaxValue;
                         // Activator.CreateInstance creates null for nullable
                         // cannot FieldInfo.GetValue fields of Value and HasValue as System.NotSupportedException : Specified method is not supported.                        
                         var valueProperty = endFieldType.GetProperty("Value"); // TODO: cache handles 
-                        object modifiedValue = GetValue(fieldsHierarchy, dummy);
+                        object modifiedValue = GetValue(fieldsHierarchy, seed);
                         var valueInside = valueProperty.GetValue(modifiedValue);
                         var empty = Activator.CreateInstance(Nullable.GetUnderlyingType(endFieldType));
                         if (!empty.Equals(valueInside))
                         {
                             if (fieldSize == -1)
+                            {
                                 fieldSize = -2;
+                            }
                         }
                         else if (fieldSize == -2)
                         {
@@ -221,42 +216,55 @@ namespace ObjectLayoutInspector
                         }
 
                         if (fieldSize == -2 && size == i + 1)
+                        {
                             fieldSize = i + 1 - offset;
+                        }
                     }
                     else
                     {
-                        dummyRef = 1;
+                        seedByteRef = 1;
                         var hasValueProperty = endFieldType.GetProperty("HasValue");
-                        object modifiedValue = GetValue(fieldsHierarchy, dummy);
+                        object modifiedValue = GetValue(fieldsHierarchy, seed);
                         if (modifiedValue != null && (bool)(hasValueProperty.GetValue(modifiedValue)) == true)
                         {
                             if (offset < 0)
+                            {
                                 offset = i;
+                            }
                         }
                     }
                 }
                 else if (endFieldType.IsValueType)
                 {
                     var empty = Activator.CreateInstance(endFieldType);
-                    dummyRef = byte.MaxValue;
-                    object modifiedValue = GetValue(fieldsHierarchy, dummy);
+                    seedByteRef = byte.MaxValue;
+                    object modifiedValue = GetValue(fieldsHierarchy, seed);
                     if (!empty.Equals(modifiedValue) && offset < 0)
+                    {
                         offset = i;
+                    }
 
                     if (offset >= 0)
+                    {
                         if (!empty.Equals(modifiedValue) || (fieldSize < 0 && size == i + 1))
+                        {
                             fieldSize = i + 1 - offset;
+                        }
+                    }
                 }
                 else
                 {
-                    dummyRef = byte.MaxValue;
-                    object value2 = GetValue(fieldsHierarchy, dummy);
+                    seedByteRef = byte.MaxValue;
+                    object value2 = GetValue(fieldsHierarchy, seed);
                     if (value2 != null)
+                    {
                         previousOffset = Add(i, Unsafe.SizeOf<IntPtr>(), fieldInfo, fieldsLayout);
-                        return;
+                    }
+
+                    return;
                 }
 
-                dummyRef = ref Unsafe.Add(ref dummyRef, 1);
+                seedByteRef = ref Unsafe.Add(ref seedByteRef, 1);
             }
 
             if (offset >= 0 && fieldSize >= 0)

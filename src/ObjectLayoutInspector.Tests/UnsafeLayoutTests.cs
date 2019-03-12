@@ -8,107 +8,39 @@ using NUnit.Framework.Internal;
 namespace ObjectLayoutInspector.Tests
 {
     [TestFixture]
-    public class UnsafeLayoutTests
+    public class UnsafeLayoutTests : TestsBase
     {
         [Test]
-        public void GetFieldsLayoutLongByte()
-        {
-            var structLayout = UnsafeLayout.GetFieldsLayout<LongByteStruct>();
-            var typeLayout = TypeLayout.GetLayout<LongByteStruct>(includePaddings: false).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-            Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
-            Assert.AreEqual(typeLayout[0].Size, structLayout[0].Size);
-            Assert.AreEqual(typeof(long), structLayout[0].FieldInfo.FieldType);
-            Assert.AreEqual(typeLayout[1].Offset, structLayout[1].Offset);
-            Assert.AreEqual(typeLayout[1].Size, structLayout[1].Size);
-            Assert.AreEqual(typeof(byte), structLayout[1].FieldInfo.FieldType);
-        }
+        public void GetFieldsLayoutLongByte() => AssertNonRecursive<LongByteStruct>();
 
         [Test]
-        public void GetLayoutLongByte()
-        {
-            var structLayout = UnsafeLayout.GetLayout<LongByteStruct>();
-            var typeLayout = TypeLayout.GetLayout<LongByteStruct>(includePaddings: true).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-            Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
-            Assert.AreEqual(typeLayout[0].Size, structLayout[0].Size);
-            Assert.AreEqual(typeLayout[1].Offset, structLayout[1].Offset);
-            Assert.AreEqual(typeLayout[1].Size, structLayout[1].Size);
-            Assert.AreEqual(typeLayout[2].Offset, structLayout[2].Offset);
-            Assert.AreEqual(typeLayout[2].Size, structLayout[2].Size);
-        }
+        public void GetLayoutLongByte() => AssertNonRecursiveWithPadding<LongByteStruct>();
 
         [Test]
-        public void GetFieldsLayoutEnumIntStruct()
-        {
-            var structLayout = UnsafeLayout.GetFieldsLayout<EnumIntStruct>();
-            var typeLayout = TypeLayout.GetLayout<EnumIntStruct>(includePaddings: false).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-            Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
-            Assert.AreEqual(typeLayout[0].Size, structLayout[0].Size);
-            Assert.AreEqual(typeof(ByteEnum), structLayout[0].FieldInfo.FieldType);
-            Assert.AreEqual(typeLayout[1].Offset, structLayout[1].Offset);
-            Assert.AreEqual(typeLayout[1].Size, structLayout[1].Size);
-            Assert.AreEqual(typeof(int), structLayout[1].FieldInfo.FieldType);
-        }
+        public void GetFieldsLayoutEnumIntStruct() => AssertNonRecursive<EnumIntStruct>();
+        
+        [Test]
+        public void GetLayoutEnumIntStruct() => AssertNonRecursiveWithPadding<EnumIntStruct>();
 
         [Test]
-        public void GetLayoutEnumIntStruct()
-        {
-            var structLayout = UnsafeLayout.GetLayout<EnumIntStruct>();
-            var typeLayout = TypeLayout.GetLayout<EnumIntStruct>(includePaddings: true).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-            TypeLayout.PrintLayout<EnumIntStruct>();
-            Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
-            Assert.AreEqual(typeLayout[0].Size, structLayout[0].Size);
-            Assert.AreEqual(typeLayout[1].Offset, structLayout[1].Offset);
-            Assert.AreEqual(typeLayout[1].Size, structLayout[1].Size);
-        }
-
-        [Test]
-        public void GetFieldsLayoutFloatFloatFloatStruct()
-        {
-            var structLayout = UnsafeLayout.GetFieldsLayout<FloatFloatFloatStruct>();
-            var typeLayout = TypeLayout.GetLayout<FloatFloatFloatStruct>(includePaddings: false).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-            Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
-            Assert.AreEqual(typeLayout[0].Size, structLayout[0].Size);
-            Assert.AreEqual(typeof(float), structLayout[0].FieldInfo.FieldType);
-            Assert.AreEqual(typeLayout[1].Offset, structLayout[1].Offset);
-            Assert.AreEqual(typeLayout[1].Size, structLayout[1].Size);
-            Assert.AreEqual(typeof(float), structLayout[1].FieldInfo.FieldType);
-            Assert.AreEqual(typeLayout[2].Offset, structLayout[2].Offset);
-            Assert.AreEqual(typeLayout[2].Size, structLayout[2].Size);
-            Assert.AreEqual(typeof(float), structLayout[2].FieldInfo.FieldType);
-        }
+        public void GetFieldsLayoutFloatFloatFloatStruct() => AssertNonRecursive<FloatFloatFloatStruct>();
 
         [Test]
         public void GetFieldsLayoutFloatFloatStruct()
         {
             TypeLayout.PrintLayout<FloatFloatStruct>();
-            var structLayout = UnsafeLayout.GetFieldsLayout<FloatFloatStruct>();
-            var typeLayout = TypeLayout.GetLayout<FloatFloatStruct>(includePaddings: false).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-            Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
-            Assert.AreEqual(typeLayout[0].Size, structLayout[0].Size);
-            Assert.AreEqual(typeof(float), structLayout[0].FieldInfo.FieldType);
-            Assert.AreEqual(typeLayout[1].Offset, structLayout[1].Offset);
-            Assert.AreEqual(typeLayout[1].Size, structLayout[1].Size);
-            Assert.AreEqual(typeof(float), structLayout[1].FieldInfo.FieldType);
-
+            AssertNonRecursive<FloatFloatStruct>();
         }
-
-
-
 
         [Test]
         public void GetFieldsLayoutStructsNonRecursive()
         {
+            // TODO: for some reason output is different
             var structLayout = UnsafeLayout.GetFieldsLayout<ComplexStruct>(recursive: false);
             var typeLayout = TypeLayout.GetLayout<ComplexStruct>(includePaddings: false).Fields;
             Assert.AreEqual(typeLayout.Count(), structLayout.Count());
         }
-
+        
         [Test]
         public void GetFieldsLayoutStructs()
         {
@@ -165,80 +97,35 @@ namespace ObjectLayoutInspector.Tests
         }
 
         [Test]
-        public void UnionStruct()
-        {
-            var structLayout = UnsafeLayout.GetFieldsLayout<UnionStruct>();
-            var typeLayout = TypeLayout.GetLayout<UnionStruct>(includePaddings: false).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-        }
+        public void UnionStruct() => AssertNonRecursive<UnionStruct>();
+ 
+        [Test]
+        public void UnionStructPadding() => AssertNonRecursiveWithPadding<UnionStruct>();
 
         [Test]
-        public void UnionStructPadding()
-        {
-            var structLayout = UnsafeLayout.GetLayout<UnionStruct>();
-            var typeLayout = TypeLayout.GetLayout<UnionStruct>(includePaddings: true).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-        }
+        public void ExplicitLayoutOverlapStruct() => AssertNonRecursive<ExplicitLayoutOverlapStruct>();
 
         [Test]
-        public void ExplicitLayoutOverlapStruct()
-        {
-            var structLayout = UnsafeLayout.GetFieldsLayout<ExplicitLayoutOverlapStruct>();
-            var typeLayout = TypeLayout.GetLayout<ExplicitLayoutOverlapStruct>(includePaddings: false).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-        }
+        public void ExplicitLayoutOverlapStructPadding() => AssertNonRecursiveWithPadding<ExplicitLayoutOverlapStruct>();
 
         [Test]
-        public void ExplicitLayoutOverlapStructPadding()
-        {
-            var structLayout = UnsafeLayout.GetLayout<ExplicitLayoutOverlapStruct>();
-            var typeLayout = TypeLayout.GetLayout<ExplicitLayoutOverlapStruct>(includePaddings: true).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-        }
+        public void ExplicitLayoutNoOverlapStruct() => AssertNonRecursive<ExplicitLayoutNoOverlapStruct>();
 
         [Test]
-        public void ExplicitLayoutNoOverlapStruct()
-        {
-            var structLayout = UnsafeLayout.GetFieldsLayout<ExplicitLayoutNoOverlapStruct>();
-            var typeLayout = TypeLayout.GetLayout<ExplicitLayoutNoOverlapStruct>(includePaddings: false).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-        }
+        public void ExplicitLayoutNoOverlapStructPadding() => AssertNonRecursiveWithPadding<ExplicitLayoutNoOverlapStruct>();
+
 
         [Test]
-        public void ExplicitLayoutNoOverlapStructPadding()
-        {
-            var structLayout = UnsafeLayout.GetLayout<ExplicitLayoutNoOverlapStruct>();
-            var typeLayout = TypeLayout.GetLayout<ExplicitLayoutNoOverlapStruct>(includePaddings: true).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-        }
+        public void BoolBoolStruct() => AssertNonRecursiveWithPadding<BoolBoolStruct>();
 
         [Test]
-        public void BoolBoolStruct()
-        {
-            var structLayout = UnsafeLayout.GetLayout<BoolBoolStruct>();
-            var typeLayout = TypeLayout.GetLayout<BoolBoolStruct>(includePaddings: true).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-            Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
-            Assert.AreEqual(typeLayout[0].Size, structLayout[0].Size);
-            Assert.AreEqual(typeLayout[1].Offset, structLayout[1].Offset);
-            Assert.AreEqual(typeLayout[1].Size, structLayout[1].Size);
-        }
-
-        [Test]
-        public void MASTER_STRUCT()
-        {
-            var structLayout = UnsafeLayout.GetLayout<MASTER_STRUCT>(recursive:false);
-            var typeLayout = TypeLayout.GetLayout<MASTER_STRUCT>(includePaddings: true).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-            Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
-            Assert.AreEqual(typeLayout[0].Size, structLayout[0].Size);
-        }        
+        public void MASTER_STRUCT() => AssertNonRecursiveWithPadding<MASTER_STRUCT>();
 
         [Test]
         public void MASTER_STRUCTFieldsRecursive()
         {
-            var structLayout = UnsafeLayout.GetLayout<MASTER_STRUCT>(recursive:true, new List<Type>{typeof(Guid)});
-            Assert.AreEqual(6, structLayout.Count());            
-        }        
+            var structLayout = UnsafeLayout.GetLayout<MASTER_STRUCT>(recursive: true, new List<Type> { typeof(Guid) });
+            Assert.AreEqual(6, structLayout.Count());
+        }
     }
 }

@@ -4,35 +4,21 @@ using NUnit.Framework;
 
 namespace ObjectLayoutInspector.Tests
 {
-
     [TestFixture]
-    public class GenericStructsTests
+    public class GenericStructsTests : TestsBase
     {
         [Test]
         public void GenericStructInt()
         {
             TypeLayout.PrintLayout<GenericStruct<int>>();
-            var structLayout = UnsafeLayout.GetLayout<GenericStruct<int>>();
-            var typeLayout = TypeLayout.GetLayout<GenericStruct<int>>(includePaddings: true);
-            Assert.AreEqual(typeLayout.Fields[0].Offset, structLayout[0].Offset);
-            Assert.AreEqual(typeLayout.Fields[0].Size, structLayout[0].Size);
-            Assert.AreEqual(typeLayout.Fields[1].Offset, structLayout[1].Offset);
-            Assert.AreEqual(typeLayout.Fields[1].Size, structLayout[1].Size);
-            Assert.AreEqual(typeLayout.Fields[2].Offset, structLayout[2].Offset);
-            Assert.AreEqual(typeLayout.Fields[2].Size, structLayout[2].Size);
+            AssertNonRecursiveWithPadding<GenericStruct<int>>();
         }
 
         [Test]
         public void GenericGenericStructInt()
         {
             TypeLayout.PrintLayout<GenericStruct<GenericStruct<int>>>();
-            var structLayout = UnsafeLayout.GetFieldsLayout<GenericStruct<GenericStruct<int>>>(recursive: false);
-            var typeLayout = TypeLayout.GetLayout<GenericStruct<GenericStruct<int>>>(includePaddings: false);
-            Assert.AreEqual(typeLayout.Fields.Count(), structLayout.Count());
-            Assert.AreEqual(typeLayout.Fields[0].Offset, structLayout[0].Offset);
-            Assert.AreEqual(typeLayout.Fields[0].Size, structLayout[0].Size);
-            Assert.AreEqual(typeLayout.Fields[1].Offset, structLayout[1].Offset);
-            Assert.AreEqual(typeLayout.Fields[1].Size, structLayout[1].Size);
+            AssertNonRecursiveWithPadding<GenericStruct<GenericStruct<int>>>();
         }
 
         [Test]

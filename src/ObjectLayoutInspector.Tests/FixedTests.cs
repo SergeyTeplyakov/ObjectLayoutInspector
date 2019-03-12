@@ -4,19 +4,17 @@ using NUnit.Framework;
 
 namespace ObjectLayoutInspector.Tests
 {
-
     [TestFixture]
-    public class FixedTests
+    public class FixedTests : TestsBase
     {
         [Test]
-        public void FixedBytes()
-        {
-            TypeLayout.PrintLayout<FixedBytes>();
-            var structLayout = UnsafeLayout.GetLayout<FixedBytes>();
-            var typeLayout = TypeLayout.GetLayout<FixedBytes>(includePaddings: true);
-            Assert.AreEqual(typeLayout.Fields[0].Offset, structLayout[0].Offset);
-            Assert.AreEqual(typeLayout.Fields[0].Size, structLayout[0].Size);
+        public void FixedBytesSame() => AssertNonRecursiveWithPadding<FixedBytes>();
 
+        [Test]
+        public void FixedBytesNoPadding()
+        {
+
+            var typeLayout = TypeLayout.GetLayout<FixedBytes>(includePaddings: true);
             Assert.That(typeLayout.Paddings, Is.EqualTo(0));
         }
     }

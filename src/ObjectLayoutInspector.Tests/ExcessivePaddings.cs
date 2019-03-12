@@ -14,7 +14,7 @@ namespace ObjectLayoutInspector.Tests
 #endif
 
     [TestFixture]
-    public class ExcessivePaddings
+    public class ExcessivePaddings : TestsBase
     {
         internal struct StructMultipleByteWrappers
         {
@@ -26,14 +26,10 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void PrintStructMultipleByteWrappersLayout()
         {
-            var structLayout = UnsafeLayout.GetLayout<StructMultipleByteWrappers>();
-            var typeLayout = TypeLayout.GetLayout<StructMultipleByteWrappers>();
-            var typeLayoutFields = typeLayout.Fields;
-            Assert.AreEqual(typeLayoutFields.Count(), structLayout.Count());
+            AssertNonRecursiveWithPadding<StructMultipleByteWrappers>();
 
             // If the layout is sequential, then structs are aligned properly with no paddings
             TypeLayout.PrintLayout<StructMultipleByteWrappers>();
-            Assert.That(typeLayout.Size, Is.EqualTo(3));
         }
 
         internal struct ByteWrapper
@@ -59,11 +55,7 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void PrintClassMultipleByteWrappersLayout()
         {
-            var structLayout = UnsafeLayout.GetLayout<Slot<long>>();
-            var typeLayout = TypeLayout.GetLayout<Slot<long>>();
-            var typeLayoutFields = typeLayout.Fields;
-            Assert.AreEqual(typeLayoutFields.Count(), structLayout.Count());
-
+            AssertNonRecursiveWithPadding<Slot<long>>();
             // In this case every field aligned on the pointer boundaries
             TypeLayout.PrintLayout<Slot<long>>();
             //Assert.That(TypeLayout.GetLayout<Slot>().Size, Is.EqualTo(24));

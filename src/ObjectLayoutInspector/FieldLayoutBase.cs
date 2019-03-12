@@ -38,7 +38,7 @@ namespace ObjectLayoutInspector
         {
             FieldInfo = fieldInfo;
         }
-        
+
         public FieldLayout(int offset, FieldInfo fieldInfo, int size)
             : base(offset, size)
         {
@@ -46,6 +46,12 @@ namespace ObjectLayoutInspector
         }
 
         public FieldInfo FieldInfo { get; }
+
+        public override bool Equals(object obj) =>
+            obj is FieldLayout fieldLayout
+            && Offset == fieldLayout.Offset
+            && Size == fieldLayout.Size
+            && FieldInfo == fieldLayout.FieldInfo;
 
         protected override string NameOrDescription =>
             $"{FieldInfo.FieldType.Name} {FieldInfo.Name}";
@@ -58,5 +64,10 @@ namespace ObjectLayoutInspector
         }
 
         protected override string NameOrDescription => "padding";
+
+        public override bool Equals(object obj) =>
+            obj is Padding padding
+            && Offset == padding.Offset
+            && Size == padding.Size;     
     }
 }

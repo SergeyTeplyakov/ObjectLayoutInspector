@@ -5,7 +5,6 @@ using NUnit.Framework.Internal;
 
 namespace ObjectLayoutInspector.Tests
 {
-
     [TestFixture]
     public class StructSizeTests
     {

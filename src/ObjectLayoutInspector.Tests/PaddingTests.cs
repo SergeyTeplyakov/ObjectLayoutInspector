@@ -4,13 +4,13 @@ using NUnit.Framework;
 
 namespace ObjectLayoutInspector.Tests
 {
-
     [TestFixture]
-    public class PaddingTests
+    public class PaddingTests : TestsBase
     {
         [Test]
         public void UnsafeStructHasEmptyPaddings()
         {
+            // TODO: for some reason output is different
             var typeLayout = TypeLayout.GetLayout<WithNestedUnsafeStruct>(includePaddings: true);
             var structLayout = UnsafeLayout.GetLayout<WithNestedUnsafeStruct>();
             Assert.AreEqual(Unsafe.SizeOf<WithNestedUnsafeStruct>(), typeLayout.Size);
@@ -23,11 +23,7 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void LayoutForInstanceWithStringShouldNotCrash()
         {
-            var structLayout = UnsafeLayout.GetLayout<WithString>();
-            var typeLayout = TypeLayout.GetLayout<WithString>(includePaddings: true);
-            Assert.AreEqual(Unsafe.SizeOf<WithString>(), typeLayout.Size);
-            var typeLayoutFields = typeLayout.Fields;
-            Assert.AreEqual(typeLayoutFields.Count(), structLayout.Count());
+            AssertNonRecursiveWithPadding<WithString>();
 
             // I know, I know. This is bad to name tests like this. But this is life:)
             var layout = TypeLayout.GetLayout<WithString>();
