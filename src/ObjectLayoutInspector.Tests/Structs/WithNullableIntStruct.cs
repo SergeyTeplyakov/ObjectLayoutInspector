@@ -2,6 +2,11 @@
 {
     struct WithNullableIntStruct
     {
-        private int? one;
+        int? one;
     }
+
+    struct WithNullableBoolBoolStructStruct
+    {
+        BoolBoolStruct? one;
+    }    
 }
