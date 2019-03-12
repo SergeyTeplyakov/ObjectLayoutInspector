@@ -207,43 +207,6 @@ namespace ObjectLayoutInspector.Tests
             var structLayout = UnsafeLayout.GetLayout<ExplicitLayoutNoOverlapStruct>();
             var typeLayout = TypeLayout.GetLayout<ExplicitLayoutNoOverlapStruct>(includePaddings: true).Fields;
             Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-        }
-
-        [Test]
-        public void NullableInt()
-        {
-            // why cannot use `public struct Nullable<T> where T : struct`?
-            // error CS0453: The type 'int?' must be a non-nullable value type in order to use it as parameter 'T' in the generic type or method 'UnsafeLayout.GetLayout<T>(bool)'
-            // var structLayout = UnsafeLayout.GetLayout<Nullable<int>>();
-        }
-
-        [Test]
-        public void ComplexComplex()
-        {
-            var structLayout = UnsafeLayout.GetFieldsLayout<System.Numerics.Complex>();
-            var typeLayout = TypeLayout.GetLayout<System.Numerics.Complex>(includePaddings: false).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count());
-            Assert.AreEqual(typeLayout[0].Offset, structLayout[0].Offset);
-            Assert.AreEqual(typeLayout[0].Size, structLayout[0].Size);
-            Assert.AreEqual(typeLayout[1].Offset, structLayout[1].Offset);
-            Assert.AreEqual(typeLayout[1].Size, structLayout[1].Size);
-        }
-
-        [Test]
-        public void ComplexInsideAsPrimitive()
-        {
-            var structLayout = UnsafeLayout.GetFieldsLayout<CustomPrimitive>(primitives: new HashSet<Type> { typeof(Complex) });
-            Assert.AreEqual(1, structLayout.Count());
-            Assert.AreEqual(0, structLayout[0].Offset);
-            Assert.AreEqual(16, structLayout[0].Size);
-        }
-
-        [Test]
-        public void Vector2AsPrimitive()
-        {
-            TypeLayout.PrintLayout<Vector2>();
-            var structLayout = UnsafeLayout.GetFieldsLayout<Vector2>(primitives: new HashSet<Type> { typeof(Vector2) });
-            Assert.AreEqual(0, structLayout.Count());            
-        }
+        }   
     }
 }
