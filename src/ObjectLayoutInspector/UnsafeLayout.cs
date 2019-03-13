@@ -169,7 +169,8 @@ namespace ObjectLayoutInspector
         //
         // next could work in unity if unsafe fails to work (non portable)
         // https://docs.unity3d.com/2018.3/Documentation/ScriptReference/Unity.Collections.LowLevel.Unsafe.UnsafeUtility.html  
-        //   
+        // https://docs.unity3d.com/2018.3/Documentation/ScriptReference/Unity.Collections.LowLevel.Unsafe.UnsafeUtility.GetFieldOffset.html
+        // https://docs.unity3d.com/2018.3/Documentation/ScriptReference/Unity.Collections.LowLevel.Unsafe.UnsafeUtility.PinGCObjectAndGetAddress.html
         private static void FindOffset<T>(
            ref int previousOffset,
            List<Type> typeHierarchy,

@@ -11,13 +11,8 @@ namespace ObjectLayoutInspector.Tests
         //[Test]
         public void UnsafeStructHasEmptyPaddings()
         {
-            // TODO: out put is different. we should count oadding 
+            AssertNonRecursiveWithPadding<WithNestedUnsafeStruct>();
             var typeLayout = TypeLayout.GetLayout<WithNestedUnsafeStruct>(includePaddings: true);
-            var structLayout = UnsafeLayout.GetLayout<WithNestedUnsafeStruct>(recursive:false);
-            Assert.AreEqual(Unsafe.SizeOf<WithNestedUnsafeStruct>(), typeLayout.Size);
-            var typeLayoutFields = typeLayout.Fields;
-            Assert.AreEqual(typeLayoutFields.Count(), structLayout.Count());
-
             Assert.That(typeLayout.Paddings, Is.EqualTo(0));
         }
 

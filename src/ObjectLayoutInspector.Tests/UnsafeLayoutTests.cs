@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Numerics;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace ObjectLayoutInspector.Tests
 {
@@ -34,7 +36,11 @@ namespace ObjectLayoutInspector.Tests
 
         // TODO: BUG: fix for unsafe
         //[Test]
-        public void GetFieldsLayoutStructsNonRecursive()
+        public void VeryVeryComplexStruct() => AssertNonRecursive<VeryVeryComplexStruct>();
+
+        // TODO: BUG: fix for unsafe
+        //[Test]
+        public void ComplexStruct()
         {
             // TODO: out put is different. we should count padding in the end of first struct as part of it? 
             // Unsafe can support padding in the end, but not in the end and state (doubt this happens)
@@ -63,10 +69,7 @@ namespace ObjectLayoutInspector.Tests
             //  | |   4-7: Int32 two (4 bytes)   |        |
             //  | |==============================|        |
             //  |=========================================|
-            TypeLayout.PrintLayout<ComplexStruct>();
-            var structLayout = UnsafeLayout.GetFieldsLayout<ComplexStruct>(recursive: false);
-            var typeLayout = TypeLayout.GetLayout<ComplexStruct>(includePaddings: false).Fields;
-            Assert.AreEqual(typeLayout.Count(), structLayout.Count() + 1);
+            AssertNonRecursive<ComplexStruct>();
         }
         
         [Test]
