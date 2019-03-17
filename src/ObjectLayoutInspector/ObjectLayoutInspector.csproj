@@ -3,16 +3,18 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0-preview2-26406-04" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.0" />
   </ItemGroup>
 
   <PropertyGroup>
     <PackageId>ObjectLayoutInspector</PackageId>
-    <PackageVersion>0.1.1.0</PackageVersion>
+    <PackageVersion>0.1.2.0</PackageVersion>
     <Authors>SergeyTeplyakov</Authors>
     <PackageLicenseUrl>https://github.com/SergeyTeplyakov/ObjectLayoutInspector/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/SergeyTeplyakov/ObjectLayoutInspector</PackageProjectUrl>
@@ -20,9 +22,9 @@
     <RepositoryUrl>http://REPOSITORY_URL_HERE_OR_DELETE_THIS_LINE</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>Library for getting a CLR instance's layout at runtime</Description>
-    <PackageReleaseNotes>Initial reslease.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added layout via Unsafe.</PackageReleaseNotes>
     <Copyright>Copyright Sergey Teplyakov</Copyright>
-    <PackageTags>clr_internals</PackageTags>
+    <PackageTags>clr_internals;unsafe;</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
 

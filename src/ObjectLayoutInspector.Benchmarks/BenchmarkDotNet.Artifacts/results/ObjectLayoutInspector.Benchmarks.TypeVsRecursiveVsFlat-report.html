@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>ObjectLayoutInspector.Benchmarks.TypeVsRecursiveVsFlat</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.11.3, OS=Windows 10.0.17134.590 (1803/April2018Update/Redstone4)
+Intel Core i7-7700HQ CPU 2.80GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cores
+.NET Core SDK=3.0.100-preview-009812
+  [Host] : .NET Core 2.1.6 (CoreCLR 4.6.27019.06, CoreFX 4.6.27019.05), 64bit RyuJIT
+  Core   : .NET Core 2.1.6 (CoreCLR 4.6.27019.06, CoreFX 4.6.27019.05), 64bit RyuJIT
+</code></pre>
+<pre><code>Job=Core  Runtime=Core  
+</code></pre>
+
+<table>
+<thead><tr><th>                       Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Gen 0/1k Op</th><th>Gen 1/1k Op</th><th>Gen 2/1k Op</th><th>Allocated Memory/Op</th>
+</tr>
+</thead><tbody><tr><td>TypeLayoutStruct</td><td>6,535.6 us</td><td>98.409 us</td><td>92.052 us</td><td>46.8750</td><td>23.4375</td><td>-</td><td>149.12 KB</td>
+</tr><tr><td>TypeLayoutPaddingsStruct</td><td>6,614.8 us</td><td>112.103 us</td><td>99.376 us</td><td>46.8750</td><td>23.4375</td><td>-</td><td>149.12 KB</td>
+</tr><tr><td>UnsafeLayoutStruct</td><td>889.1 us</td><td>7.178 us</td><td>6.363 us</td><td>172.8516</td><td>-</td><td>-</td><td>531.18 KB</td>
+</tr><tr><td>UnsafeLayoutPaddingsStruct</td><td>884.5 us</td><td>6.987 us</td><td>6.536 us</td><td>172.8516</td><td>-</td><td>-</td><td>531.5 KB</td>
+</tr><tr><td>UnsafeLayoutPaddingsRecursiveStruct</td><td>917.8 us</td><td>8.702 us</td><td>8.140 us</td><td>172.8516</td><td>-</td><td>-</td><td>532.48 KB</td>
+</tr></tbody></table>
+</body>
+</html>

@@ -1,9 +1,10 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Linq;
+using System.Runtime.InteropServices;
 using NUnit.Framework;
 
 namespace ObjectLayoutInspector.Tests
 {
-    // Uncomment the following line to see the difference.
+// Uncomment the following line to see the difference.
 //#define UseAlias
 
 #if UseAlias
@@ -13,7 +14,7 @@ namespace ObjectLayoutInspector.Tests
 #endif
 
     [TestFixture]
-    public class ExcessivePaddings
+    public class ExcessivePaddings : TestsBase
     {
         internal struct StructMultipleByteWrappers
         {
@@ -25,9 +26,10 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void PrintStructMultipleByteWrappersLayout()
         {
+            AssertNonRecursiveWithPadding<StructMultipleByteWrappers>();
+
             // If the layout is sequential, then structs are aligned properly with no paddings
             TypeLayout.PrintLayout<StructMultipleByteWrappers>();
-            Assert.That(TypeLayout.GetLayout<StructMultipleByteWrappers>().Size, Is.EqualTo(3));
         }
 
         internal struct ByteWrapper
@@ -53,6 +55,7 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void PrintClassMultipleByteWrappersLayout()
         {
+            AssertNonRecursiveWithPadding<Slot<long>>();
             // In this case every field aligned on the pointer boundaries
             TypeLayout.PrintLayout<Slot<long>>();
             //Assert.That(TypeLayout.GetLayout<Slot>().Size, Is.EqualTo(24));
