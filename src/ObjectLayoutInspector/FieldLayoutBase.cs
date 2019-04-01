@@ -33,12 +33,6 @@ namespace ObjectLayoutInspector
 
     public sealed class FieldLayout : FieldLayoutBase
     {
-        public FieldLayout(int offset, FieldInfo fieldInfo)
-            : base(offset, InspectorHelper.GetFieldSize(fieldInfo.FieldType))
-        {
-            FieldInfo = fieldInfo;
-        }
-
         public FieldLayout(int offset, FieldInfo fieldInfo, int size)
             : base(offset, size)
         {

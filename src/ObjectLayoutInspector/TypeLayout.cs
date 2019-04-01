@@ -125,41 +125,22 @@ namespace ObjectLayoutInspector
             {
                 var (size, overhead) = InspectorHelper.GetSize(type);
 
-                var fieldsOffsets = InspectorHelper.GetFieldOffsets(type);
-                var fields = new List<FieldLayoutBase>();
+                // fields with no paddings
+                var fieldsAndOffsets = InspectorHelper.GetFieldOffsets(type);
+                var fieldsOffsets = fieldsAndOffsets
+                                    .Select(x => new FieldLayout(x.offset, x.fieldInfo, InspectorHelper.GetFieldSize(x.fieldInfo.FieldType)))
+                                    .ToArray();
 
-                if (includePaddings && fieldsOffsets.Length != 0 && fieldsOffsets[0].offset != 0)
-                {
-                    fields.Add(new Padding(0, fieldsOffsets[0].offset));
-                }
 
-                for (var index = 0; index < fieldsOffsets.Length; index++)
-                {
-                    var fieldOffset = fieldsOffsets[index];
-                    var fieldInfo = new FieldLayout(fieldOffset.offset, fieldOffset.fieldInfo);
-                    fields.Add(fieldInfo);
+                var layouts = new List<FieldLayoutBase>();
 
-                    if (includePaddings)
-                    {
-                        int nextOffsetOrSize = size;
-                        if (index != fieldsOffsets.Length - 1)
-                        {
-                            // This is not a last field.
-                            nextOffsetOrSize = fieldsOffsets[index + 1].offset;
-                        }
+                Padder.AddPaddings(includePaddings, size, fieldsOffsets, layouts);
 
-                        var nextSectionOffsetCandidate = fieldInfo.Offset + fieldInfo.Size;
-                        if (nextSectionOffsetCandidate < nextOffsetOrSize)
-                        {
-                            // we have padding
-                            fields.Add(new Padding(nextSectionOffsetCandidate, nextOffsetOrSize - nextSectionOffsetCandidate));
-                        }
-                    }
-                }
-
-                return new TypeLayout(type, size, overhead, fields.ToArray(), cache);
+                return new TypeLayout(type, size, overhead, layouts.ToArray(), cache);
             }
         }
+
+  
 
         public bool Equals(TypeLayout other)
         {

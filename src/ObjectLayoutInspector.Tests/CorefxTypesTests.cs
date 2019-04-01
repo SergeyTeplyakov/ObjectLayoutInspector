@@ -16,7 +16,7 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void ComplexInsideAsPrimitive()
         {
-            var structLayout = UnsafeLayout.GetFieldsLayout<CustomPrimitive>(primitives: new HashSet<Type> { typeof(Complex) });
+            var structLayout = UnsafeLayout.GetFieldsLayout<CustomPrimitive>(considerPrimitives: new HashSet<Type> { typeof(Complex) });
             Assert.AreEqual(1, structLayout.Count());
             Assert.AreEqual(0, structLayout[0].Offset);
             Assert.AreEqual(16, structLayout[0].Size);
@@ -26,7 +26,7 @@ namespace ObjectLayoutInspector.Tests
         public void Vector2AsPrimitive()
         {
             TypeLayout.PrintLayout<Vector2>();
-            var structLayout = UnsafeLayout.GetFieldsLayout<Vector2>(primitives: new HashSet<Type> { typeof(Vector2) });
+            var structLayout = UnsafeLayout.GetFieldsLayout<Vector2>(considerPrimitives: new HashSet<Type> { typeof(Vector2) });
             Assert.AreEqual(1, structLayout.Count());
         }
 

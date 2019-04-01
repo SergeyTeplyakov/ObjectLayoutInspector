@@ -27,24 +27,28 @@ namespace ObjectLayoutInspector
     // 1. replace recursion with loop-trampoline
     // 2. calculate all fields needed first and then create on big array for all stuff to run through it 
     // 3. then can write more efficient scan total algorithm (which hopefully will outlive longer than API provided by .NET Core in future)
+    // 4. as field value got and activator created instance - reuse it for all siblings instead of GC churn (not one by one, but batch)
     public static class UnsafeLayout
     {
         /// <summary>
         /// Get fields layout of <typeparamref name="T"/> with no padding information ordered by offset.
         /// </summary>
-        /// <typeparam name="T">To to get structure of.</>
-        public static IReadOnlyList<FieldLayout> GetFieldsLayout<T>(bool recursive = true, IReadOnlyCollection<Type> primitives = null)
+        /// <typeparam name="T">To to get structure of.</typeparam>
+        /// <param name="considerPrimitives">Eny type in collection will be considered primitive and will not be splitted into several fields.</param>
+        public static IReadOnlyList<FieldLayout> GetFieldsLayout<T>(bool recursive = true, IReadOnlyCollection<Type> considerPrimitives = null)
             where T : struct
         {
             var tree = GetLayoutTree<T>();
-            var fieldsLayout = GetFieldsLayoutInternal<T>(in tree, recursive, primitives);
-            return fieldsLayout.OrderBy(x => x.Offset).ToList();
+            IEnumerable<FieldLayout> fieldsLayout = GetFieldsLayoutInternal<T>(in tree, recursive, considerPrimitives).OrderBy(x => x.Offset);
+            return fieldsLayout.ToList();
         }
 
         /// <summary>
         /// Get layout of <typeparamref name="T"/> with padding information ordered by offset.
         /// </summary>
-        public static IReadOnlyList<FieldLayoutBase> GetLayout<T>(bool recursive = true, IReadOnlyCollection<Type> primitives = null, bool hierarchical = false)
+        /// <typeparam name="T">To to get structure of.</typeparam>
+        /// <param name="considerPrimitives">Eny type in collection will be considered primitive and will not be splitted into several fields.</param>
+        public static IReadOnlyList<FieldLayoutBase> GetLayout<T>(bool recursive = true, IReadOnlyCollection<Type> considerPrimitives = null, bool hierarchical = false)
             where T : struct
         {
             if (hierarchical)
@@ -53,8 +57,13 @@ namespace ObjectLayoutInspector
             }
 
             var tree = GetLayoutTree<T>();
-            var fieldsLayout = GetFieldsLayoutInternal<T>(in tree, recursive, primitives);
-            return AddPaddings<T>(fieldsLayout);
+            IEnumerable<FieldLayout> fieldsLayout =
+                GetFieldsLayoutInternal<T>(in tree, recursive, considerPrimitives)
+                .OrderBy(x => x.Offset);
+
+            var layouts = new List<FieldLayoutBase>();
+            Padder.AddPaddings(true, Unsafe.SizeOf<T>(), fieldsLayout.OrderBy(x => x.Offset).ToArray(), layouts);
+            return layouts;
         }
 
         private static IReadOnlyList<FieldLayout> GetFieldsLayoutInternal<T>(in RootNode tree, bool recursive, IReadOnlyCollection<Type> primitives) where T : struct
@@ -75,7 +84,8 @@ namespace ObjectLayoutInspector
 
                 for (var i = 0; i < tree.children.Length; i++)
                 {
-                    fieldsLayout.Add(GetLayout(ref tree.children[i]));
+                    var child = GetLayout(ref tree.children[i]);
+                    fieldsLayout.Add(child);
                 }
 
                 return fieldsLayout;
@@ -122,37 +132,36 @@ namespace ObjectLayoutInspector
             switch (node.kind)
             {
                 case NodeKind.Reference:
-                    layout.Add(new FieldLayout(node.ReferenceNode.totalOffset, node.ReferenceNode.info, node.ReferenceNode.size));
+                    layout.Add(new FieldLayout(node.referenceNode.totalOffset, node.referenceNode.info, node.referenceNode.size));
                     break;
                 case NodeKind.Primitive:
-                    layout.Add(new FieldLayout(node.PrimitiveNode.totalOffset, node.PrimitiveNode.info, node.PrimitiveNode.size));
+                    layout.Add(new FieldLayout(node.primitiveNode.totalOffset, node.primitiveNode.info, node.primitiveNode.size));
                     break;
                 case NodeKind.Nullable:
                     if (check(node))
                     {
-                        layout.Add(new FieldLayout(node.NullableNode.totalOffset, node.NullableNode.info, node.NullableNode.size));
+                        layout.Add(new FieldLayout(node.nullableNode.totalOffset, node.nullableNode.info, node.nullableNode.size));
                         break;
                     }
 
-                    for (var i = 0; i < node.NullableNode.children.Length; i++)
-                    {
-                        GetLayout(ref node.NullableNode.children[i], layout, check);
-                    }
+                    GetLayout(ref node.nullableNode.hasValue.value, layout, check);
+                    GetLayout(ref node.nullableNode.value.value, layout, check);
+
                     break;
 
                 case NodeKind.Fixed:
-                    layout.Add(new FieldLayout(node.FixedNode.totalOffset, node.FixedNode.info, node.FixedNode.size));
+                    layout.Add(new FieldLayout(node.fixedNode.totalOffset, node.fixedNode.info, node.fixedNode.size));
                     break;
                 case NodeKind.Complex:
                     if (check(node))
                     {
-                        layout.Add(new FieldLayout(node.ComplexNode.totalOffset, node.ComplexNode.info, node.ComplexNode.size));
+                        layout.Add(new FieldLayout(node.complexNode.totalOffset, node.complexNode.info, node.complexNode.size));
                         break;
                     }
 
-                    for (var i = 0; i < node.ComplexNode.children.Length; i++)
+                    for (var i = 0; i < node.complexNode.children.Length; i++)
                     {
-                        GetLayout(ref node.ComplexNode.children[i], layout, check);
+                        GetLayout(ref node.complexNode.children[i], layout, check);
                     }
                     break;
                 default:
@@ -166,101 +175,71 @@ namespace ObjectLayoutInspector
             switch (node.kind)
             {
                 case NodeKind.Reference:
-                    return new FieldLayout(node.ReferenceNode.totalOffset, node.ReferenceNode.info, node.ReferenceNode.size);
+                    return new FieldLayout(node.referenceNode.totalOffset, node.referenceNode.info, node.referenceNode.size);
                 case NodeKind.Primitive:
-                    return new FieldLayout(node.PrimitiveNode.totalOffset, node.PrimitiveNode.info, node.PrimitiveNode.size);
+                    return new FieldLayout(node.primitiveNode.totalOffset, node.primitiveNode.info, node.primitiveNode.size);
                 case NodeKind.Nullable:
-                    return new FieldLayout(node.NullableNode.totalOffset, node.NullableNode.info, node.NullableNode.size);
+                    return new FieldLayout(node.nullableNode.totalOffset, node.nullableNode.info, node.nullableNode.size);
                 case NodeKind.Fixed:
-                    return new FieldLayout(node.FixedNode.totalOffset, node.FixedNode.info, node.FixedNode.size);
+                    return new FieldLayout(node.fixedNode.totalOffset, node.fixedNode.info, node.fixedNode.size);
                 case NodeKind.Complex:
-                    return new FieldLayout(node.ComplexNode.totalOffset, node.ComplexNode.info, node.ComplexNode.size);
+                    {
+                        var lastNodeKind = node.complexNode.children[node.complexNode.children.Length - 1].kind;
+                        var layout = new FieldLayout(node.complexNode.totalOffset, node.complexNode.info, node.complexNode.size);
+                        return lastNodeKind != NodeKind.Fixed ? FixPadding(layout) : layout;
+                    }
+
                 default:
                     throw new NotImplementedException($"{node.kind} is not supported");
             }
+        }
+
+        // paddings according on current running architecure-runtime
+        // counts padding in the end of first struct as part of it
+        // Unsafe can support padding in the end, but not in the end and state (doubt this happens)
+        // https://en.wikipedia.org/wiki/Data_structure_alignment
+        private static FieldLayout FixPadding(FieldLayout x)
+        {
+            if (x.Size > 8 && x.Size % 8 != 0 && !Detectors.IsFixed(x.FieldInfo, out var _))
+            {
+                return new FieldLayout(x.Offset, x.FieldInfo, x.Size + x.Size % 8);
+            }
+
+            return x;
         }
 
         private static RootNode GetLayoutTree<T>() where T : struct
         {
             var type = typeof(T);
             var fields = FieldNode.GetFieldNodes(type);
-            var root = new FieldNode { kind = NodeKind.Root, RootNode = new RootNode { children = fields, totalOffset = 0, size = Unsafe.SizeOf<T>() } };
+            var root = new FieldNode { kind = NodeKind.Root, rootNode = new RootNode { children = fields, totalOffset = 0, size = Unsafe.SizeOf<T>() } };
             var previous = 0;
             GetLayout<T>(ref previous, ref root, new List<Func<object, object>>(), new List<Twiddler<T>> { null });
 
-            return root.RootNode;
-        }
-
-        private static IReadOnlyList<FieldLayoutBase> AddPaddings<T>(IReadOnlyList<FieldLayout> fieldsLayout)
-        {
-            var fieldsAndPaddings = new List<FieldLayoutBase>(fieldsLayout.Count);
-            var ordered = fieldsLayout.OrderBy(x => x.Offset).ToList();
-            while (ordered.Count() > 0)
-            {
-                var head = ordered[0];
-                var last = fieldsAndPaddings.LastOrDefault();
-                var lastOffset = last?.Offset + last?.Size ?? 0;
-                var paddingSize = head.Offset - lastOffset;
-                if (paddingSize > 0)
-                {
-                    fieldsAndPaddings.Add(new Padding(lastOffset, paddingSize));
-                }
-
-                fieldsAndPaddings.Add(head);
-                ordered.RemoveAt(0);
-                while (ordered.Count() > 0)
-                {
-                    var second = ordered[0];
-                    if (head.Offset + head.Size > second.Offset + second.Size)
-                    {
-                        fieldsAndPaddings.Add(second);
-                        ordered.RemoveAt(0);
-                    }
-                    else if (head.Offset + head.Size > second.Offset)
-                    {
-                        fieldsAndPaddings.Add(second);
-                        ordered.RemoveAt(0);
-                        head = second;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-
-            var lastByte = fieldsAndPaddings.Max(x => x.Offset + x.Size);
-            var ending = Unsafe.SizeOf<T>() - lastByte;
-            if (ending > 0)
-            {
-                fieldsAndPaddings.Add(new Padding(lastByte, ending));
-            }
-
-            return fieldsAndPaddings;
+            return root.rootNode;
         }
 
         private static void GetLayout<T>(
            ref int previous,
            ref FieldNode node,
            List<Func<object, object>> getterHierarchy,
-           List<Twiddler<T>> twiddlerHierarchy
-           )
+           List<Twiddler<T>> twiddlerHierarchy)
            where T : struct
         {
             switch (node.kind)
             {
                 case NodeKind.Reference:
-                    FindReferenceOffset<T>(ref node.ReferenceNode, getterHierarchy);
+                    FindReferenceOffset<T>(ref node.referenceNode, getterHierarchy);
                     break;
                 case NodeKind.Primitive:
-                    var pType = node.PrimitiveNode.Type;
+                    var pType = node.primitiveNode.Type;
                     Func<object, bool> primitiveEmptyComparator = x => Activator.CreateInstance(pType).Equals(x);
                     if (!Detectors.IsNullable(node.info.DeclaringType))
                     {
                         getterHierarchy.Add(node.info.GetValue);
                     }
 
-                    FindPrimitiveOffset<T>(ref node.PrimitiveNode, getterHierarchy, primitiveEmptyComparator, twiddlerHierarchy);
+                    FindPrimitiveOffset<T>(ref node.primitiveNode, getterHierarchy, primitiveEmptyComparator, twiddlerHierarchy);
 
                     if (!Detectors.IsNullable(node.info.DeclaringType))
                     {
@@ -272,45 +251,48 @@ namespace ObjectLayoutInspector
                     // Activator.CreateInstance creates null for nullable
                     // cannot FieldInfo.GetValue fields of Value and HasValue as System.NotSupportedException : Specified method is not supported.  0
 
-                    node.NullableNode.children = FieldNode.GetFieldNodes(node.NullableNode.Type);
+                    var nullable = FieldNode.GetFieldNodes(node.nullableNode.Type);
+                    node.nullableNode.hasValue = new Ref<FieldNode>(nullable[0]);
+                    node.nullableNode.value = new Ref<FieldNode>(nullable[1]);
+                    ref var hasValue = ref node.nullableNode.hasValue.value;
                     getterHierarchy.Add(node.info.GetValue);
 
                     var propertyGetter = node.info.FieldType.GetProperty("HasValue");
                     Func<object, object> hasValueGetter = x => x != null ? propertyGetter.GetValue(x) : null;
                     getterHierarchy.Add(hasValueGetter);
                     Func<object, bool> hasValueEmptyComparator = x => x == null;
-                    FindPrimitiveOffset<T>(ref node.NullableNode.children[0].PrimitiveNode, getterHierarchy, hasValueEmptyComparator, twiddlerHierarchy);
+                    FindPrimitiveOffset<T>(ref hasValue.primitiveNode, getterHierarchy, hasValueEmptyComparator, twiddlerHierarchy);
                     getterHierarchy.RemoveAt(getterHierarchy.Count - 1);
 
-                    var underType = Nullable.GetUnderlyingType(node.NullableNode.Type);
+                    var underType = Nullable.GetUnderlyingType(node.nullableNode.Type);
                     Func<object, bool> nullableEmptyComparator = x => Activator.CreateInstance(underType).Equals(x);
                     var valueProperty = node.info.FieldType.GetProperty("Value"); // may cache handles 
                     getterHierarchy.Add(valueProperty.GetValue);
-                    var t = new NullableTwiddler(node.NullableNode.children[0].PrimitiveNode.totalOffset);
+                    var t = new NullableTwiddler(hasValue.totalOffset);
                     twiddlerHierarchy.Add(t.Twiddle);
-                    GetLayout<T>(ref previous, ref node.NullableNode.children[1], getterHierarchy, twiddlerHierarchy);
+                    GetLayout<T>(ref previous, ref node.nullableNode.value.value, getterHierarchy, twiddlerHierarchy);
                     twiddlerHierarchy.RemoveAt(twiddlerHierarchy.Count - 1);
-                    node.totalOffset = node.NullableNode.children[0].PrimitiveNode.totalOffset;
-                    node.NullableNode.size = node.NullableNode.children[1].PrimitiveNode.totalOffset + node.NullableNode.children[1].PrimitiveNode.size - node.totalOffset;
+                    node.totalOffset = hasValue.primitiveNode.totalOffset;
+                    node.nullableNode.size = node.nullableNode.value.value.totalOffset + node.nullableNode.value.value.size - node.totalOffset;
                     getterHierarchy.RemoveAt(getterHierarchy.Count - 1);
 
                     getterHierarchy.RemoveAt(getterHierarchy.Count - 1);
                     break;
                 case NodeKind.Fixed:
                     // TODO: support non primitive fixed as soon as C# will do that https://github.com/dotnet/csharplang/issues/1494
-                    var fType = node.PrimitiveNode.Type;
+                    var fType = node.primitiveNode.Type;
                     Func<object, bool> fixedEmptyComparator = x => Activator.CreateInstance(fType).Equals(x);
                     getterHierarchy.Add(node.info.GetValue);
-                    FindPrimitiveOffset<T>(ref node.PrimitiveNode, getterHierarchy, fixedEmptyComparator, twiddlerHierarchy);
+                    FindPrimitiveOffset<T>(ref node.primitiveNode, getterHierarchy, fixedEmptyComparator, twiddlerHierarchy);
                     getterHierarchy.RemoveAt(getterHierarchy.Count - 1);
-                    node.FixedNode.size = node.FixedNode.size * node.FixedNode.length;
+                    node.fixedNode.size = node.fixedNode.size * node.fixedNode.length;
                     break;
                 case NodeKind.Root:
-                    if (!node.RootNode.IsPrimitive)
+                    if (!node.rootNode.IsPrimitive)
                     {
-                        for (var i = 0; i < node.RootNode.children.Length; i++)
+                        for (var i = 0; i < node.rootNode.children.Length; i++)
                         {
-                            ref var child = ref node.RootNode.children[i];
+                            ref var child = ref node.rootNode.children[i];
                             GetLayout<T>(ref previous, ref child, getterHierarchy, twiddlerHierarchy);
                         }
                     }
@@ -321,27 +303,30 @@ namespace ObjectLayoutInspector
                     {
                         getterHierarchy.Add(node.info.GetValue);
                     }
-                    node.ComplexNode.children = FieldNode.GetFieldNodes(node.ComplexNode.Type);
-                    for (var i = 0; i < node.ComplexNode.children.Length; i++)
+
+                    node.complexNode.children = FieldNode.GetFieldNodes(node.complexNode.Type);
+                    for (var i = 0; i < node.complexNode.children.Length; i++)
                     {
-                        ref var child = ref node.ComplexNode.children[i];
+                        ref var child = ref node.complexNode.children[i];
                         GetLayout<T>(ref previous, ref child, getterHierarchy, twiddlerHierarchy);
                     }
 
                     //TODO: use ref compare-sort https://github.com/dotnet/corefx/issues/33927
-                    node.ComplexNode.children = node.ComplexNode.children.OrderBy(x => x.totalOffset).ThenByDescending(x => x.size).ToArray();
-                    node.totalOffset = node.ComplexNode.children[0].totalOffset;
+                    node.complexNode.children = node.complexNode.children.OrderBy(x => x.totalOffset).ThenByDescending(x => x.size).ToArray();
+                    node.totalOffset = node.complexNode.children[0].totalOffset;
 
-                    for (var i = 0; i < node.ComplexNode.children.Length; i++)
+                    for (var i = 0; i < node.complexNode.children.Length; i++)
                     {
-                        ref var child = ref node.ComplexNode.children[i];
+                        ref var child = ref node.complexNode.children[i];
                         var possibleEnd = child.totalOffset + child.size;
-                        node.ComplexNode.size = Math.Max(node.ComplexNode.size, possibleEnd - node.ComplexNode.totalOffset);
+                        node.complexNode.size = Math.Max(node.complexNode.size, possibleEnd - node.complexNode.totalOffset);
                     }
+
                     if (!Detectors.IsNullable(node.info.DeclaringType))
                     {
                         getterHierarchy.RemoveAt(getterHierarchy.Count - 1);
                     }
+
                     break;
                 default:
                     throw new NotImplementedException($"{node.kind} is not supported");

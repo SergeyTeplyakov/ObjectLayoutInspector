@@ -33,14 +33,14 @@ namespace ObjectLayoutInspector
                 int length = 0;
                 return
                     x.FieldType.IsClass
-                    ? new FieldNode { kind = NodeKind.Reference, ReferenceNode = new ReferenceNode(x) }
+                    ? new FieldNode { kind = NodeKind.Reference, referenceNode = new ReferenceNode(x) }
                     : Detectors.IsPrimitive(x)
-                    ? new FieldNode { kind = NodeKind.Primitive, PrimitiveNode = new PrimitiveNode { info = x } }
+                    ? new FieldNode { kind = NodeKind.Primitive, primitiveNode = new PrimitiveNode { info = x } }
                     : Detectors.IsNullable(x)
-                    ? new FieldNode { kind = NodeKind.Nullable, NullableNode = new NullableNode { info = x } }
+                    ? new FieldNode { kind = NodeKind.Nullable, nullableNode = new NullableNode { info = x } }
                     : Detectors.IsFixed(x, out length)
-                    ? new FieldNode { kind = NodeKind.Fixed, FixedNode = new FixedNode { info = x, length = length } }
-                    : new FieldNode { kind = NodeKind.Complex, ComplexNode = new ComplexNode { info = x } };
+                    ? new FieldNode { kind = NodeKind.Fixed, fixedNode = new FixedNode { info = x, length = length } }
+                    : new FieldNode { kind = NodeKind.Complex, complexNode = new ComplexNode { info = x } };
             }).ToArray();
         }
 
@@ -57,17 +57,22 @@ namespace ObjectLayoutInspector
         public FieldInfo info;
 
         [FieldOffset(8)]
-        public PrimitiveNode PrimitiveNode;
+        public PrimitiveNode primitiveNode;
+        
         [FieldOffset(8)]
-        public ComplexNode ComplexNode;
+        public ComplexNode complexNode;
+
         [FieldOffset(8)]
-        public RootNode RootNode;
+        public RootNode rootNode;
+
         [FieldOffset(8)]
-        public NullableNode NullableNode;
+        public NullableNode nullableNode;
+
         [FieldOffset(8)]
-        public FixedNode FixedNode;
+        public FixedNode fixedNode;
+
         [FieldOffset(8)]
-        public ReferenceNode ReferenceNode;
+        public ReferenceNode referenceNode;
 
         public Type Type => info.FieldType;
     }
@@ -105,15 +110,30 @@ namespace ObjectLayoutInspector
 
         [FieldOffset(16)]
         public FieldInfo info;
-
-        // TODO: think of more typed modeling of hasValue field and value field (which may me primitive or complex, but not fixed or reference or nullable)
-
+       
+        // Nullable can be only of Complex or Primitive, so may model FieldNode as remain part only of 2
+        // validate of same size and field layout it test and Unsafe.As map to reinterpret cast
+        /// <summary>
+        /// Boolean.
+        /// </summary>
         [FieldOffset(24)]
-        public FieldNode[] children;
+        public Ref<FieldNode> hasValue;
+
+        [FieldOffset(32)]
+        public Ref<FieldNode> value;
 
         public Type Type => info.FieldType;
     }
 
+    internal class Ref<T> where T: struct
+    {
+        public T value;
+
+        public Ref(T value)
+        {
+            this.value = value;
+        }
+    }
 
     [StructLayout(LayoutKind.Explicit)]
     internal struct FixedNode
@@ -146,7 +166,7 @@ namespace ObjectLayoutInspector
         public FieldInfo info;
 
         public Type Type => info.FieldType;
-    }
+    } 
 
     [StructLayout(LayoutKind.Explicit)]
     internal struct ComplexNode

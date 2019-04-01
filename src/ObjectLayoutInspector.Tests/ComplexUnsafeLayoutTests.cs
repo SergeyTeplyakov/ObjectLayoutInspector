@@ -12,21 +12,14 @@ namespace ObjectLayoutInspector.Tests
     [TestFixture]
     public class ComplexUnsafeLayoutTests : TestsBase
     {
-        // TODO: uncomment tests with fix for unsafe paddings according on current running architecure-runtime (what paper to read)?
-        // field offsets are correct (values with actual bits)
-        // out put is different. we should count padding in the end of first struct as part of it? 
-        // Unsafe can support padding in the end, but not in the end and state (doubt this happens)
-        // possible fixes - create property tree in UnsafeLayout code to handle siblings 
-        // or just hack empty space for non recursive case after wards?
-        // need to think how to fix. is padding at all part of FIRST structure?
-
+        //TODO: https://github.com/SergeyTeplyakov/ObjectLayoutInspector/issues/20
         //[Test]
         public void VeryVeryComplexStruct() => AssertNonRecursive<VeryVeryComplexStruct>();
 
-        //[Test]
+        [Test]
         public void ExplicitHolderOfSequentialIntObjectStruct() => AssertNonRecursiveWithPadding<ExplicitHolderOfSequentialIntObjectStruct>();
 
-        //[Test]
+        [Test]
         public void ComplexStruct() => AssertNonRecursive<ComplexStruct>();
 
 

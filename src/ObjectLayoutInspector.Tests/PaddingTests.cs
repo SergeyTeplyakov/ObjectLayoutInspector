@@ -15,7 +15,16 @@ namespace ObjectLayoutInspector.Tests
             Assert.That(typeLayout.Paddings, Is.EqualTo(0));
         }
 
-       [Test]
+        // TODO: fix fixed inside struct paddings rules and test (fixed + bool, bool + fixed, fixed byte 1/2/3/4,5/6/7 w/wo bool)        
+        //[Test]
+        public void WithNestedUnsafeUnsafeStruct()
+        {
+            AssertNonRecursiveWithPadding<WithNestedUnsafeUnsafeStruct>();
+            var typeLayout = TypeLayout.GetLayout<WithNestedUnsafeUnsafeStruct>(includePaddings: true);
+            Assert.That(typeLayout.Paddings, Is.EqualTo(0));
+        }
+
+        [Test]
         public void UnsafeStructRecursive()
         {
             TypeLayout.PrintLayout<WithNestedUnsafeStruct>();
