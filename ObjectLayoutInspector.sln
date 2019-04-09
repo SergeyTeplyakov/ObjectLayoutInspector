@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.2027
+# Visual Studio 16
+VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectLayoutInspector", "src\ObjectLayoutInspector\ObjectLayoutInspector.csproj", "{D89F0520-ED92-4413-BCB2-5365C13447EB}"
 EndProject
