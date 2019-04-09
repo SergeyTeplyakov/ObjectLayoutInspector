@@ -1,16 +1,15 @@
-﻿using System.Linq;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using NUnit.Framework;
 
 namespace ObjectLayoutInspector.Tests
 {
-// Uncomment the following line to see the difference.
-//#define UseAlias
+    // Uncomment the following line to see the difference.
+    //#define UseAlias
 
 #if UseAlias
     using ByteWrapper = System.Byte;
 #else
-    
+
 #endif
 
     [TestFixture]
