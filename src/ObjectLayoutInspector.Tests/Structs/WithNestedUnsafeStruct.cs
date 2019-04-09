@@ -1,7 +1,9 @@
 ﻿namespace ObjectLayoutInspector.Tests
 {
-    struct WithNestedUnsafeStruct
+    public struct WithNestedUnsafeStruct
     {
-        private FixedBytes fb;
+        public FixedBytes fb;
+
+        public WithNestedUnsafeStruct(FixedBytes fb) => this.fb = fb;
     }
 }

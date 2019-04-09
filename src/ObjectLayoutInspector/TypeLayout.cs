@@ -117,7 +117,7 @@ namespace ObjectLayoutInspector
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Failed to create an instance of type {type}");
+                Console.WriteLine($"Failed to create an instance of type {type}: {e}.");
                 throw;
             }            
 

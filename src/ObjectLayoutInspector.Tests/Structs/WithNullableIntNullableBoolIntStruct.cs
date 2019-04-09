@@ -1,16 +1,19 @@
 namespace ObjectLayoutInspector.Tests
 {
-    struct WithNullableIntIntStruct
+    public struct WithNullableIntIntStruct
     {
-        int? theNullableInt;
+        public int? theNullableInt;
+        public int theInt;
 
-        int theInt;
-    } 
+        public WithNullableIntIntStruct(int? theNullableInt, int theInt) => (this.theNullableInt, this.theInt) = (theNullableInt, theInt);
+    }
 
-    struct WithNullableIntNullableBoolIntStruct
+    public struct WithNullableIntNullableBoolIntStruct
     {
-        int? one;
-        bool? two;
-        int three;
+        public int? one;
+        public bool? two;
+        public int three;
+
+        public WithNullableIntNullableBoolIntStruct(int? one, bool? two, int three) => (this.one, this.two, this.three) = (one, two, three);
     }    
 }

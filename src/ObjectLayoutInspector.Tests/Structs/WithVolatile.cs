@@ -2,8 +2,8 @@
 {
     public struct WithVolatile
     {
-        private object obj;
-        private int i1;
-        private int i2;
+        public object obj;
+        public int i1;
+        public int i2;
     }
 }

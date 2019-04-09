@@ -21,6 +21,8 @@ namespace ObjectLayoutInspector.Tests
             public ByteWrapper bw1;
             public ByteWrapper bw2;
             public ByteWrapper bw3;
+
+            public StructMultipleByteWrappers(ByteWrapper bw1, ByteWrapper bw2, ByteWrapper bw3) => (this.bw1, this.bw2, this.bw3) = (bw1, bw2, bw3);
         }
 
         [Test]
@@ -35,6 +37,8 @@ namespace ObjectLayoutInspector.Tests
         internal struct ByteWrapper
         {
             public byte b;
+
+            public ByteWrapper(byte b) => this.b = b;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -47,9 +51,11 @@ namespace ObjectLayoutInspector.Tests
 
         internal struct Slot<T>
         {
-            internal int hashCode;      // Lower 31 bits of hash code, -1 if unused
-            internal T value;
-            internal int next;          // Index of next entry, -1 if last
+            public int hashCode;      // Lower 31 bits of hash code, -1 if unused
+            public T value;
+            public int next;          // Index of next entry, -1 if last
+
+            public Slot(int hashCode, T value, int next) => (this.hashCode, this.value, this.next) = (hashCode, value, next);
         }
 
         [Test]

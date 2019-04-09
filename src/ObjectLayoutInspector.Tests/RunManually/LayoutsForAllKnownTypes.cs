@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
@@ -13,17 +11,24 @@ namespace ObjectLayoutInspector.Tests.RunManually
     {
         struct SizeComputer<T>
         {
-#pragma warning disable 0649 // Unassigned field
-#pragma warning disable 169 // Unused field
             public T field1;
             public T field2;
-#pragma warning restore 169 // Unused field
-#pragma warning restore 0649 // Unassigned field
+
+            public SizeComputer(T field1, T field2) => (this.field1, this.field2) = (field1, field2);
         }
 
-        struct Test1 { byte b; double d; byte b2; double d2; byte b3; }
+        struct Test1
+        {
+            public byte b; public double d; public byte b2; public double d2; public byte b3;
 
-        struct Test2 { double d; double d2; byte b; byte b2; byte b3; }
+            public Test1(byte b, double d, byte b2, double d2, byte b3) => (this.b, this.d, this.b2, this.d2, this.b3) = (b, d, b2, d2, b3);
+        }
+
+        struct Test2
+        {
+            public double d; public double d2; public byte b; public byte b2; public byte b3;
+            public Test2(byte b, double d, byte b2, double d2, byte b3) => (this.d, this.d2, this.b, this.b2, this.b3) = (d, d2, b, b2, b3);
+        }
 
         [Test]
         public void GetLayoutForTwoSpecificTypes()

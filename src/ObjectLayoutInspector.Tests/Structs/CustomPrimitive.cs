@@ -4,6 +4,6 @@ namespace ObjectLayoutInspector.Tests
 {
     public struct CustomPrimitive
     {
-        Complex one;
+        public Complex one;
     }
 }

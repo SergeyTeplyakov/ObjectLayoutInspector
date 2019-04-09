@@ -3,9 +3,9 @@
     public unsafe struct ComplexFixedStruct
     {
         public const int MaxLength = 13;
-        private fixed short _bytes[MaxLength];
-        private FixedBytes fb;
+        public fixed short _bytes[MaxLength];
+        public FixedBytes fb;
 
-        bool three;
+        public bool three;
     }
 }
