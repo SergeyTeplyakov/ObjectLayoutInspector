@@ -1,7 +1,9 @@
 namespace ObjectLayoutInspector.Tests
 {
-    struct WithNullableBoolBoolStructStruct
+    public struct WithNullableBoolBoolStructStruct
     {
-        BoolBoolStruct? one;
+        public BoolBoolStruct? one;
+
+        public WithNullableBoolBoolStructStruct(BoolBoolStruct? one) => this.one = one;
     }    
 }

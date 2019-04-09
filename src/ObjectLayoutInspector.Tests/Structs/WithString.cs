@@ -1,7 +1,9 @@
 ﻿namespace ObjectLayoutInspector.Tests
 {
-    struct WithString
+    public struct WithString
     {
-        string s;
+        public string s;
+
+        public WithString(string s) => this.s = s;
     }
 }
