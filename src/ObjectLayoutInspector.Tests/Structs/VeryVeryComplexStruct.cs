@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace ObjectLayoutInspector.Tests
 {
     public unsafe struct VeryVeryComplexStruct

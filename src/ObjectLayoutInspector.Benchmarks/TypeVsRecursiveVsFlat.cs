@@ -1,7 +1,4 @@
-using System;
-using BenchmarkDotNet;
 using BenchmarkDotNet.Attributes;
-using ObjectLayoutInspector;
 using ObjectLayoutInspector.Tests;
 
 namespace ObjectLayoutInspector.Benchmarks

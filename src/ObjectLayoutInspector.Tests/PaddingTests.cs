@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Runtime.CompilerServices;
 using NUnit.Framework;
 
 namespace ObjectLayoutInspector.Tests

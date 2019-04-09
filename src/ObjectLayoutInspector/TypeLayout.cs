@@ -9,7 +9,7 @@ namespace ObjectLayoutInspector
     /// <summary>
     /// Represents layout of a given type.
     /// </summary>
-    public struct TypeLayout
+    public struct TypeLayout : IEquatable<TypeLayout>
     {
         public Type Type { get; }
 
@@ -30,9 +30,10 @@ namespace ObjectLayoutInspector
         /// </summary>
         public int Paddings { get; }
 
+        /// <nodoc />
         public FieldLayoutBase[] Fields { get; }
 
-        private TypeLayout(Type type, int size, int overhead, FieldLayoutBase[] fields, TypeLayoutCache cache)
+        private TypeLayout(Type type, int size, int overhead, FieldLayoutBase[] fields, TypeLayoutCache? cache)
         {
             Type = type;
             Size = size;
@@ -43,7 +44,7 @@ namespace ObjectLayoutInspector
             // Assuming there is no one.
             var thisInstancePaddings = type.IsUnsafeValueType() ? 0 : fields.OfType<Padding>().Sum(p => p.Size);
 
-            cache = cache ?? TypeLayoutCache.Create();
+            cache ??= TypeLayoutCache.Create();
 
             var nestedPaddings = fields
                 // Need to include paddings for value types only
@@ -74,6 +75,7 @@ namespace ObjectLayoutInspector
         public override string ToString()
             => ToString(recursively: true);
 
+        /// <nodoc />
         public string ToString(bool recursively)
         {
             var sb = new StringBuilder();
@@ -97,12 +99,12 @@ namespace ObjectLayoutInspector
             return null;
         }
 
-        public static TypeLayout GetLayout<T>(TypeLayoutCache cache = null, bool includePaddings = true)
+        public static TypeLayout GetLayout<T>(TypeLayoutCache? cache = null, bool includePaddings = true)
         {
             return GetLayout(typeof(T), cache, includePaddings);
         }
 
-        public static TypeLayout GetLayout(Type type, TypeLayoutCache cache = null, bool includePaddings = true)
+        public static TypeLayout GetLayout(Type type, TypeLayoutCache? cache = null, bool includePaddings = true)
         {
             if (cache != null && cache.LayoutCache.TryGetValue(type, out var result))
             {
@@ -140,29 +142,22 @@ namespace ObjectLayoutInspector
             }
         }
 
-  
-
+        /// <inheritdoc />
         public bool Equals(TypeLayout other)
         {
             return Type == other.Type && Size == other.Size && Overhead == other.Overhead && Paddings == other.Paddings;
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
             return obj is TypeLayout && Equals((TypeLayout)obj);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
-            unchecked
-            {
-                var hashCode = (Type != null ? Type.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ Size;
-                hashCode = (hashCode * 397) ^ Overhead;
-                hashCode = (hashCode * 397) ^ Paddings;
-                return hashCode;
-            }
+            return (Type, Size, Overhead, Paddings).GetHashCode();
         }
 
     }

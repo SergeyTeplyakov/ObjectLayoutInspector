@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
+// It is not clear how to write MaxBy with in non-nullable context. Technically, this method is null-invariant.
+#nullable disable
+
 namespace ObjectLayoutInspector
 {
     internal static class EnumerableExtensions
@@ -9,7 +12,7 @@ namespace ObjectLayoutInspector
         {
             bool firstElement = false;
             T maxValue = default(T);
-            foreach (var e in sequence)
+            foreach (T e in sequence)
             {
                 if (!firstElement)
                 {
@@ -18,8 +21,8 @@ namespace ObjectLayoutInspector
                 }
                 else
                 {
-                    var currentMax = selector(maxValue);
-                    var maxCandidate = selector(e);
+                    int currentMax = selector(maxValue);
+                    int maxCandidate = selector(e);
 
                     if (Math.Max(currentMax, maxCandidate) == maxCandidate)
                     {

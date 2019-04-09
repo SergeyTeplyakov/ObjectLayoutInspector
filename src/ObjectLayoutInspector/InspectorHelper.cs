@@ -109,7 +109,7 @@ namespace ObjectLayoutInspector
             var fields = t.GetInstanceFields();
             //var fields2 = t.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
 
-            Func<object, long[]> fieldOffsetInspector = GenerateFieldOffsetInspectionFunction(fields);
+            Func<object?, long[]> fieldOffsetInspector = GenerateFieldOffsetInspectionFunction(fields);
 
             var (instance, success) = ReflectionHelper.TryCreateInstanceSafe(t);
             if (!success)
@@ -135,7 +135,7 @@ namespace ObjectLayoutInspector
             long GetBaseLine(long referenceAddress) => t.IsValueType ? referenceAddress : referenceAddress + IntPtr.Size;
         }
 
-        private static Func<object, long[]> GenerateFieldOffsetInspectionFunction(FieldInfo[] fields)
+        private static Func<object?, long[]> GenerateFieldOffsetInspectionFunction(FieldInfo[] fields)
         {
             var method = new DynamicMethod(
                 name: "GetFieldOffsets",
@@ -194,7 +194,7 @@ namespace ObjectLayoutInspector
             ilGen.Emit(OpCodes.Ldloc_0);
             ilGen.Emit(OpCodes.Ret);
 
-            return (Func<object, long[]>)method.CreateDelegate(typeof(Func<object, long[]>));
+            return (Func<object?, long[]>)method.CreateDelegate(typeof(Func<object, long[]>));
         }
     }
 }

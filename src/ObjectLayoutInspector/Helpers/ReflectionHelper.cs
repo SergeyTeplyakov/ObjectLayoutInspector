@@ -47,7 +47,7 @@ namespace ObjectLayoutInspector.Helpers
         /// * Open generic types like <code>typeof(List&lt;&gt;)</code>
         /// * Abstract types
         /// </remarks>
-        public static (object result, bool success) TryCreateInstanceSafe(Type t)
+        public static (object? result, bool success) TryCreateInstanceSafe(Type t)
         {
             if (!CanCreateInstance(t))
             {
@@ -70,10 +70,10 @@ namespace ObjectLayoutInspector.Helpers
             // I've got null for some security related types.
             return Success(GetUninitializedObject(t));
 
-            (object result, bool success) Success(object o) => (o, o != null);
+            (object? result, bool success) Success(object? o) => (o, o != null);
         }
 
-        private static object GetUninitializedObject(Type t)
+        private static object? GetUninitializedObject(Type t)
         {
             try
             {
