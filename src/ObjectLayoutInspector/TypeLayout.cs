@@ -11,22 +11,28 @@ namespace ObjectLayoutInspector
     /// </summary>
     public struct TypeLayout : IEquatable<TypeLayout>
     {
+        /// <summary>
+        /// A CLR type of the layout.
+        /// </summary>
         public Type Type { get; }
 
+        /// <summary>
+        /// The full size of the type including an overhead.
+        /// </summary>
         public int FullSize => Size + Overhead;
 
         /// <summary>
-        /// Size of the type instance
+        /// Size of the type instance.
         /// </summary>
         public int Size { get; }
 
         /// <summary>
-        /// Overhead for a reference types
+        /// Overhead for a reference types.
         /// </summary>
         public int Overhead { get; }
 
         /// <summary>
-        /// Size of an empty space in the instance
+        /// Size of an empty space in the instance.
         /// </summary>
         public int Paddings { get; }
 
