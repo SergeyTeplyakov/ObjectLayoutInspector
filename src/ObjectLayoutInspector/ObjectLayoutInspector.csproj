@@ -29,4 +29,8 @@
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>D:\Sources\GitHub\ObjectLayoutInspector\src\ObjectLayoutInspector\ObjectLayoutInspector.xml</DocumentationFile>
+  </PropertyGroup>
+
 </Project>

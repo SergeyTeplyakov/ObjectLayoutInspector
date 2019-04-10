@@ -35,6 +35,7 @@ namespace ObjectLayoutInspector
         /// </summary>
         /// <typeparam name="T">To to get structure of.</typeparam>
         /// <param name="considerPrimitives">Eny type in collection will be considered primitive and will not be splitted into several fields.</param>
+        /// <param name="recursive">If true the resulting list will have fields for all nested types as well.</param>
         public static IReadOnlyList<FieldLayout> GetFieldsLayout<T>(bool recursive = true, IReadOnlyCollection<Type>? considerPrimitives = null)
             where T : struct
         {
@@ -48,6 +49,8 @@ namespace ObjectLayoutInspector
         /// </summary>
         /// <typeparam name="T">To to get structure of.</typeparam>
         /// <param name="considerPrimitives">Eny type in collection will be considered primitive and will not be splitted into several fields.</param>
+        /// <param name="recursive">If true the resulting list will have fields for all nested types as well.</param>
+        /// <param name="hierarchical">Not implemented yet if specified.</param>
         public static IReadOnlyList<FieldLayoutBase> GetLayout<T>(bool recursive = true, IReadOnlyCollection<Type>? considerPrimitives = null, bool hierarchical = false)
             where T : struct
         {

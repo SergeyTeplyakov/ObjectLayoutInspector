@@ -7,7 +7,10 @@ using ObjectLayoutInspector.Helpers;
 
 namespace ObjectLayoutInspector
 {
-    public static class InspectorHelper
+    /// <summary>
+    /// Provides helper methods for inspecting type layouts.
+    /// </summary>
+    public static class TypeInspector
     {
         /// <summary>
         /// Returns an instance size and the overhead for a given type.
@@ -74,14 +77,12 @@ namespace ObjectLayoutInspector
         /// </summary>
         struct SizeComputer<T>
         {
-#pragma warning disable 0649 // Unassigned field
-#pragma warning disable 169 // Unused field
             // Both fields should be of the same type because the CLR can rearrange the struct and 
             // the offset of the second field would be the offset of the 'dummyField' not the offset of the 'offset' field.
             public T dummyField;
             public T offset;
-#pragma warning restore 169 // Unused field
-#pragma warning restore 0649 // Unassigned field
+
+            public SizeComputer(T dummyField, T offset) => (this.dummyField, this.offset) = (dummyField, offset);
         }
 
         /// <summary>
@@ -97,11 +98,17 @@ namespace ObjectLayoutInspector
             return fieldsOffsets[1].offset;
         }
 
+        /// <summary>
+        /// Gets an array of field information and their offsets for <typeparamref name="T"/>.
+        /// </summary>
         public static (FieldInfo fieldInfo, int offset)[] GetFieldOffsets<T>()
         {
             return GetFieldOffsets(typeof(T));
         }
 
+        /// <summary>
+        /// Gets an array of field information with their offsets for a given <paramref name="t"/>.
+        /// </summary>
         public static (FieldInfo fieldInfo, int offset)[] GetFieldOffsets(Type t)
         {
             // GetFields does not return private fields from the base types.
@@ -141,7 +148,7 @@ namespace ObjectLayoutInspector
                 name: "GetFieldOffsets",
                 returnType: typeof(long[]),
                 parameterTypes: new[] { typeof(object) },
-                m: typeof(InspectorHelper).Module,
+                m: typeof(TypeInspector).Module,
                 skipVisibility: true);
 
             ILGenerator ilGen = method.GetILGenerator();

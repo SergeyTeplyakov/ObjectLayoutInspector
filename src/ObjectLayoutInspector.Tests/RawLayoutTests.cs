@@ -12,7 +12,7 @@ namespace ObjectLayoutInspector.Tests
         {
             Console.WriteLine(
                 string.Join("\r\n",
-                    InspectorHelper.GetFieldOffsets(typeof(ByteAndInt))
+                    TypeInspector.GetFieldOffsets(typeof(ByteAndInt))
                         .Select(tpl => $"Field {tpl.fieldInfo.Name}: starts at offset {tpl.offset}"))
                 );
         }
@@ -20,7 +20,7 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void PrivateBaseMembersShouldBeIncluded()
         {
-            var offsets = InspectorHelper.GetFieldOffsets(typeof(Derived));
+            var offsets = TypeInspector.GetFieldOffsets(typeof(Derived));
             Assert.That(offsets.Length, Is.EqualTo(2));
         }
     }

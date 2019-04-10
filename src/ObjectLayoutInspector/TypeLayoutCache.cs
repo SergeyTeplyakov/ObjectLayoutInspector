@@ -14,7 +14,7 @@ namespace ObjectLayoutInspector
         {
         }
 
-        public static TypeLayoutCache Create()
+        internal static TypeLayoutCache Create()
         {
             return new TypeLayoutCache();
         }
