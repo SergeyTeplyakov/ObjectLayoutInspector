@@ -58,7 +58,10 @@ namespace ObjectLayoutInspector
                 if (recursively && field is FieldLayout fl && fl.FieldInfo.FieldType.IsValueType)
                 {
                     var fieldLayout = TypeLayout.GetLayout(fl.FieldInfo.FieldType);
-                    if (fieldLayout.Fields.Length > 1)
+                    
+                    // Printing the nested structure of a field only if the field's type has fields and the field's type is not a primitive
+                    // The second part is crucial otherwise types like Int32 will cause infinite recursion.
+                    if (fieldLayout.Fields.Length > 0 && !fieldLayout.Type.IsPrimitive)
                     {
                         fieldAsString += $"\r\n{LayoutAsString(fl.FieldInfo.FieldType)}";
                     }

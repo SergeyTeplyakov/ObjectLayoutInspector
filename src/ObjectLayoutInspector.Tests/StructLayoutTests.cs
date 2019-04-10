@@ -6,6 +6,12 @@ namespace ObjectLayoutInspector.Tests
     public class StructLayoutTests : TestsBase
     {
         [Test]
+        public void TestNestedStructWithOneField()
+        {
+            AssertNonRecursiveWithPadding<NestedStructWithOneField>();
+        }
+
+        [Test]
         public void TestNonAlignedStruct()
         {
             AssertNonRecursiveWithPadding<NotAlignedStruct>();
