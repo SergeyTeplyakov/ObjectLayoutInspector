@@ -11,8 +11,14 @@ namespace ObjectLayoutInspector
     /// </summary>
     public struct TypeLayout : IEquatable<TypeLayout>
     {
+        /// <summary>
+        /// The CLR type.
+        /// </summary>
         public Type Type { get; }
 
+        /// <summary>
+        /// Returns the full size of the instance (including an overhead).
+        /// </summary>
         public int FullSize => Size + Overhead;
 
         /// <summary>
@@ -61,11 +67,17 @@ namespace ObjectLayoutInspector
             cache.LayoutCache.AddOrUpdate(type, this, (t, layout) => layout);
         }
 
+        /// <summary>
+        /// <see cref="LayoutPrinter.Print{T}(bool)"/>
+        /// </summary>
         public static void PrintLayout<T>(bool recursively = true)
         {
             LayoutPrinter.Print<T>(recursively);
         }
 
+        /// <summary>
+        /// <see cref="LayoutPrinter.Print(Type, bool)"/>
+        /// </summary>
         public static void PrintLayout(Type type, bool recursively = true)
         {
             LayoutPrinter.Print(type, recursively);
@@ -89,6 +101,9 @@ namespace ObjectLayoutInspector
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Tries to get a layout of a given <paramref name="type"/> from <paramref name="cache"/>.
+        /// </summary>
         public static TypeLayout? TryGetLayout(Type type, TypeLayoutCache cache)
         {
             if (type.CanCreateInstance())
@@ -99,11 +114,17 @@ namespace ObjectLayoutInspector
             return null;
         }
 
+        /// <summary>
+        /// Gets a layout of <typeparamref name="T"/>.
+        /// </summary>
         public static TypeLayout GetLayout<T>(TypeLayoutCache? cache = null, bool includePaddings = true)
         {
             return GetLayout(typeof(T), cache, includePaddings);
         }
 
+        /// <summary>
+        /// Gets a layout of a given <paramref name="type"/>.
+        /// </summary>
         public static TypeLayout GetLayout(Type type, TypeLayoutCache? cache = null, bool includePaddings = true)
         {
             if (cache != null && cache.LayoutCache.TryGetValue(type, out var result))
@@ -125,12 +146,12 @@ namespace ObjectLayoutInspector
 
             TypeLayout DoGetLayout()
             {
-                var (size, overhead) = InspectorHelper.GetSize(type);
+                var (size, overhead) = TypeInspector.GetSize(type);
 
                 // fields with no paddings
-                var fieldsAndOffsets = InspectorHelper.GetFieldOffsets(type);
+                var fieldsAndOffsets = TypeInspector.GetFieldOffsets(type);
                 var fieldsOffsets = fieldsAndOffsets
-                                    .Select(x => new FieldLayout(x.offset, x.fieldInfo, InspectorHelper.GetFieldSize(x.fieldInfo.FieldType)))
+                                    .Select(x => new FieldLayout(x.offset, x.fieldInfo, TypeInspector.GetFieldSize(x.fieldInfo.FieldType)))
                                     .ToArray();
 
 
@@ -159,6 +180,5 @@ namespace ObjectLayoutInspector
         {
             return (Type, Size, Overhead, Paddings).GetHashCode();
         }
-
     }
 }

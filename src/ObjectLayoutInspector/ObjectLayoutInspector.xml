@@ -1,0 +1,277 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ObjectLayoutInspector</name>
+    </assembly>
+    <members>
+        <member name="T:ObjectLayoutInspector.FieldLayoutBase">
+            <summary>
+            Base type that represents different field layouts.
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.FieldLayoutBase.Size">
+            <summary>
+            Size of a field.
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.FieldLayoutBase.Offset">
+            <summary>
+            An offset of a field from the beginning of a struct.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.FieldLayoutBase.#ctor(System.Int32,System.Int32)">
+            <nodoc />
+        </member>
+        <member name="M:ObjectLayoutInspector.FieldLayoutBase.ToString">
+            <inheritdoc />
+        </member>
+        <member name="P:ObjectLayoutInspector.FieldLayoutBase.NameOrDescription">
+            <nodoc />
+        </member>
+        <member name="T:ObjectLayoutInspector.FieldLayout">
+            <summary>
+            Represents an actual layout of a field.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.FieldLayout.#ctor(System.Int32,System.Reflection.FieldInfo,System.Int32)">
+            <nodoc />
+        </member>
+        <member name="P:ObjectLayoutInspector.FieldLayout.FieldInfo">
+            <nodoc />
+        </member>
+        <member name="M:ObjectLayoutInspector.FieldLayout.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:ObjectLayoutInspector.FieldLayout.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="P:ObjectLayoutInspector.FieldLayout.NameOrDescription">
+            <inheritdoc />
+        </member>
+        <member name="T:ObjectLayoutInspector.Padding">
+            <summary>
+            Represents a padding between fields.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.Padding.#ctor(System.Int32,System.Int32)">
+            <nodoc />
+        </member>
+        <member name="P:ObjectLayoutInspector.Padding.NameOrDescription">
+            <inheritdoc />
+        </member>
+        <member name="M:ObjectLayoutInspector.Padding.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:ObjectLayoutInspector.Padding.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:ObjectLayoutInspector.Helpers.ReflectionHelper.GetInstanceFields(System.Type)">
+            <summary>
+            Returns all instance fields including the fields declared in all base types.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.Helpers.ReflectionHelper.TryCreateInstanceSafe(System.Type)">
+            <summary>
+            Tries to create an instance of a given type.
+            </summary>
+            <remarks>
+            There is a limit of what types can be instantiated.
+            The following types are not supported by this function:
+            * Open generic types like <code>typeof(List&lt;&gt;)</code>
+            * Abstract types
+            </remarks>
+        </member>
+        <member name="M:ObjectLayoutInspector.Helpers.ReflectionHelper.CanCreateInstance(System.Type)">
+            <summary>
+            Returns true if the instance of type <paramref name="t"/> can be instantiated.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.Helpers.ReflectionHelper.IsUnsafeValueType(System.Type)">
+            <summary>
+            Returns true if a given type is unsafe.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.LayoutPrinter.Print``1(System.Boolean)">
+            <summary>
+            Prints the given <typeparamref name="T"/> to the console.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.LayoutPrinter.Print(System.Type,System.Boolean)">
+            <summary>
+            Prints a layout of a given <paramref name="type"/> to the console.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.LayoutPrinter.Print(ObjectLayoutInspector.TypeLayout,System.Boolean)">
+            <summary>
+            Prints a given <paramref name="layout"/> to the console.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.LayoutPrinter.TypeLayoutAsString(ObjectLayoutInspector.TypeLayout,System.Boolean)">
+            <summary>
+            Creates a string representation of a given <paramref name="layout"/>.
+            </summary>
+        </member>
+        <member name="T:ObjectLayoutInspector.TypeInspector">
+            <summary>
+            Provides helper methods for inspecting type layouts.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeInspector.GetSize(System.Type)">
+            <summary>
+            Returns an instance size and the overhead for a given type.
+            </summary>
+            <remarks>
+            If <paramref name="type"/> is value type then the overhead is 0.
+            Otherwise the overhead is 2 * PtrSize.
+            </remarks>
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeInspector.GetSizeOfReferenceTypeInstance(System.Type)">
+            <summary>
+            Return s the size of a reference type instance excluding the overhead.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeInspector.GetFieldSize(System.Type)">
+            <summary>
+            Returns the size of the field if the field would be of type <paramref name="t"/>.
+            </summary>
+            <remarks>
+            For reference types the size is always a PtrSize.
+            </remarks>
+        </member>
+        <member name="T:ObjectLayoutInspector.TypeInspector.SizeComputer`1">
+            <summary>
+            Helper struct that is used for computing the size of a struct.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeInspector.GetSizeOfValueTypeInstance(System.Type)">
+            <summary>
+            Computes size for <paramref name="type"/>.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeInspector.GetFieldOffsets``1">
+            <summary>
+            Gets an array of field information and their offsets for <typeparamref name="T"/>.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeInspector.GetFieldOffsets(System.Type)">
+            <summary>
+            Gets an array of field information with their offsets for a given <paramref name="t"/>.
+            </summary>
+        </member>
+        <member name="T:ObjectLayoutInspector.TypeLayout">
+            <summary>
+            Represents layout of a given type.
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.TypeLayout.Type">
+            <summary>
+            The CLR type.
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.TypeLayout.FullSize">
+            <summary>
+            Returns the full size of the instance (including an overhead).
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.TypeLayout.Size">
+            <summary>
+            Size of the type instance
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.TypeLayout.Overhead">
+            <summary>
+            Overhead for a reference types
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.TypeLayout.Paddings">
+            <summary>
+            Size of an empty space in the instance
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.TypeLayout.Fields">
+            <nodoc />
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeLayout.PrintLayout``1(System.Boolean)">
+            <summary>
+            <see cref="M:ObjectLayoutInspector.LayoutPrinter.Print``1(System.Boolean)"/>
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeLayout.PrintLayout(System.Type,System.Boolean)">
+            <summary>
+            <see cref="M:ObjectLayoutInspector.LayoutPrinter.Print(System.Type,System.Boolean)"/>
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeLayout.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeLayout.ToString(System.Boolean)">
+            <nodoc />
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeLayout.TryGetLayout(System.Type,ObjectLayoutInspector.TypeLayoutCache)">
+            <summary>
+            Tries to get a layout of a given <paramref name="type"/> from <paramref name="cache"/>.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeLayout.GetLayout``1(ObjectLayoutInspector.TypeLayoutCache,System.Boolean)">
+            <summary>
+            Gets a layout of <typeparamref name="T"/>.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeLayout.GetLayout(System.Type,ObjectLayoutInspector.TypeLayoutCache,System.Boolean)">
+            <summary>
+            Gets a layout of a given <paramref name="type"/>.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeLayout.Equals(ObjectLayoutInspector.TypeLayout)">
+            <inheritdoc />
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeLayout.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:ObjectLayoutInspector.TypeLayout.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="T:ObjectLayoutInspector.TypeLayoutCache">
+            <summary>
+            Thread-safe cache for type layouts.
+            </summary>
+        </member>
+        <member name="T:ObjectLayoutInspector.UnsafeLayout">
+            <summary>
+            Gets layout via <see cref="T:System.Runtime.CompilerServices.Unsafe"/> portable.  Works in Ahead of Time (AOT).
+            Does not use code generation or CLR debugging mechanisms or runtime intrinsic.
+            </summary>
+            <seealso href="https://docs.unity3d.com/2018.3/Documentation/ScriptReference/Unity.Collections.LowLevel.Unsafe.UnsafeUtility.GetFieldOffset.html">
+            May create field provider for that platform
+            </seealso>
+            <seealso href="https://docs.unity3d.com/2018.3/Documentation/ScriptReference/Unity.Collections.LowLevel.Unsafe.UnsafeUtility.PinGCObjectAndGetAddress.html">
+            May work with heap classes there
+            </seealso>
+            <seealso href="https://stackoverflow.com/questions/18937935/how-to-mutate-a-boxed-struct-using-il">
+            Could support classes but Marshal.SizeOf does works only with blittables, may be there is other ways to Unsafe into heap for classes
+            </seealso>
+        </member>
+        <member name="M:ObjectLayoutInspector.UnsafeLayout.GetFieldsLayout``1(System.Boolean,System.Collections.Generic.IReadOnlyCollection{System.Type})">
+            <summary>
+            Get fields layout of <typeparamref name="T"/> with no padding information ordered by offset.
+            </summary>
+            <typeparam name="T">To to get structure of.</typeparam>
+            <param name="considerPrimitives">Eny type in collection will be considered primitive and will not be splitted into several fields.</param>
+            <param name="recursive">If true the resulting list will have fields for all nested types as well.</param>
+        </member>
+        <member name="M:ObjectLayoutInspector.UnsafeLayout.GetLayout``1(System.Boolean,System.Collections.Generic.IReadOnlyCollection{System.Type},System.Boolean)">
+            <summary>
+            Get layout of <typeparamref name="T"/> with padding information ordered by offset.
+            </summary>
+            <typeparam name="T">To to get structure of.</typeparam>
+            <param name="considerPrimitives">Eny type in collection will be considered primitive and will not be splitted into several fields.</param>
+            <param name="recursive">If true the resulting list will have fields for all nested types as well.</param>
+            <param name="hierarchical">Not implemented yet if specified.</param>
+        </member>
+        <member name="F:ObjectLayoutInspector.NullableNode.hasValue">
+            <summary>
+            Boolean.
+            </summary>
+        </member>
+    </members>
+</doc>

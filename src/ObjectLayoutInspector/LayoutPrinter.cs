@@ -13,13 +13,16 @@ namespace ObjectLayoutInspector
         public static void Print<T>(bool recursively = true) => Print(typeof(T), recursively);
 
         /// <summary>
-        /// Prints the given <paramref name="type"/> to the console.
+        /// Prints a layout of a given <paramref name="type"/> to the console.
         /// </summary>
         public static void Print(Type type, bool recursively = true)
         {
             Print(TypeLayout.GetLayout(type), recursively);
         }
 
+        /// <summary>
+        /// Prints a given <paramref name="layout"/> to the console.
+        /// </summary>
         public static void Print(TypeLayout layout, bool recursively = true)
         {
             Console.WriteLine(layout.ToString(recursively));
@@ -31,6 +34,9 @@ namespace ObjectLayoutInspector
             return TypeLayoutAsString(layout, recursively);
         }
 
+        /// <summary>
+        /// Creates a string representation of a given <paramref name="layout"/>.
+        /// </summary>
         public static string TypeLayoutAsString(TypeLayout layout, bool recursively = true)
         {
             var fieldAsStrings = new List<string>(layout.Fields.Length);
