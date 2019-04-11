@@ -12,6 +12,9 @@ namespace ObjectLayoutInspector
     /// Gets layout via <see cref="Unsafe"/> portable.  Works in Ahead of Time (AOT).
     /// Does not use code generation or CLR debugging mechanisms or runtime intrinsic.
     /// </summary>
+    /// <remarks>
+    /// Works on Little Endian ARM Android and iOS AOT(IL2CPP).
+    /// </remarks>
     /// <seealso href="https://docs.unity3d.com/2018.3/Documentation/ScriptReference/Unity.Collections.LowLevel.Unsafe.UnsafeUtility.GetFieldOffset.html">
     /// May create field provider for that platform
     /// </seealso>
