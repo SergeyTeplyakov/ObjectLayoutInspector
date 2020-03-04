@@ -1,12 +1,15 @@
-# Getting an instance layout at runtime
+# ObjectLayoutInspector (Getting an instance layout at runtime)
+
+[![GitHub](https://img.shields.io/github/license/SergeyTeplyakov/ObjectLayoutInspector)](LICENSE) [![Nuget](https://img.shields.io/nuget/v/ObjectLayoutInspector)](https://www.nuget.org/packages/ObjectLayoutInspector/)
 
 ![Demo](images/FieldsLayout_Figure1.gif "Demo")
 
-There is no official documentation about fields layout because the CLR authors reserved the right to change it in the future. But knowledge about the layout can be helpful if you're curious or if you're working on a performance critical application. 
+There is no official documentation about fields layout because the CLR authors reserved the right to change it in the future. But knowledge about the layout can be helpful if you're curious or if you're working on a performance critical application.
 
 How can we inspect the layout? We can look at a raw memory in Visual Studio or use !dumpobj command in [SOS Debugging Extension](https://docs.microsoft.com/en-us/dotnet/framework/tools/sos-dll-sos-debugging-extension). These approaches are tedious and boring, so we'll try to write a tool  that will print an object layout at runtime.
 
 ## Getting the field offset at runtime
+
 We're not going to use unmanaged code or Profiling API, instead we'll use the power of [LdFlda](https://msdn.microsoft.com/en-us/library/system.reflection.emit.opcodes.ldflda(v=vs.110).aspx) instruction. This IL instruction returns an address of a field for a given type. Unfortunately, this instruction is not exposed in C# language, so we have to do some light-weight code generation to work around that limitation.
 
 In [Dissecting the new() constraint in C#](https://blogs.msdn.microsoft.com/seteplia/2017/02/01/dissecting-the-new-constraint-in-c-a-perfect-example-of-a-leaky-abstraction/) we already did something similar. We'll generate a [Dynamic Method](https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/how-to-define-and-execute-dynamic-methods) with `LdFlda` instructions.
@@ -85,7 +88,7 @@ public static (FieldInfo fieldInfo, int offset)[] GetFieldOffsets(Type t)
     }
 
     var baseLine = addresses.Min();
-    
+
     // Converting field addresses to offsets using the first field as a baseline
     return fields
         .Select((field, index) => (field: field, offset: (int)(addresses[index] - baseLine)))
@@ -123,7 +126,7 @@ Console.WriteLine(
 
 The output is:
 
-```
+```console
 Field n: starts at offset 0
 Field b: starts at offset 4
 ```
@@ -235,7 +238,7 @@ public struct NotAlignedStruct
 
 Here is a result of [`TypeLayout.Print<NotAlignedStruct>()`](https://github.com/SergeyTeplyakov/ObjectLayoutInspector/blob/master/src/ObjectLayoutInspector/ObjectLayoutInspector/TypeLayout.cs#L20) method call:
 
-```
+```console
 Size: 12. Paddings: 4 (%33 of empty space)
 |================================|
 |     0: Byte m_byte1 (1 byte)   |
@@ -270,7 +273,7 @@ public struct NotAlignedStructWithAutoLayout
 }
 ```
 
-```
+```console
 Size: 8. Paddings: 0 (%0 of empty space)
 |================================|
 |   0-3: Int32 m_int (4 bytes)   |
@@ -289,7 +292,7 @@ Size: 8. Paddings: 0 (%0 of empty space)
 
 There are two main differences between the layout of a reference type and a value type. First, each "object" instance has a header and a method table pointer. And second, the default layout for "objects" is automatic not sequential. And similar to value types, the sequential layout is possible only for classes that doesn't have any fields of reference types.
 
-Method [`TypeLayout.PrintLayout<T>(bool recursively = true)`](https://github.com/SergeyTeplyakov/ObjectLayoutInspector/blob/master/src/ObjectLayoutInspector/ObjectLayoutInspector/TypeLayout.cs#L20) takes an argument that allows to print the nested types as well. 
+Method [`TypeLayout.PrintLayout<T>(bool recursively = true)`](https://github.com/SergeyTeplyakov/ObjectLayoutInspector/blob/master/src/ObjectLayoutInspector/ObjectLayoutInspector/TypeLayout.cs#L20) takes an argument that allows to print the nested types as well.
 
 ```csharp
 public class ClassWithNestedCustomStruct
@@ -301,7 +304,7 @@ public class ClassWithNestedCustomStruct
 TypeLayout.PrintLayout<ClassWithNestedCustomStruct>(recursively: true);
 ```
 
-```
+```console
 Size: 40. Paddings: 11 (%27 of empty space)
 |========================================|
 | Object Header (8 bytes)                |
@@ -353,9 +356,9 @@ public class ClassMultipleByteWrappers
 }
 ```
 
-```
-     --- Automatic Layout ---              --- Sequential Layout ---     
-Size: 24 bytes. Paddings: 21 bytes    Size: 8 bytes. Paddings: 5 bytes 
+```console
+     --- Automatic Layout ---              --- Sequential Layout ---
+Size: 24 bytes. Paddings: 21 bytes    Size: 8 bytes. Paddings: 5 bytes
 (%87 of empty space)                  (%62 of empty space)
 |=================================|   |=================================|
 | Object Header (8 bytes)         |   | Object Header (8 bytes)         |
