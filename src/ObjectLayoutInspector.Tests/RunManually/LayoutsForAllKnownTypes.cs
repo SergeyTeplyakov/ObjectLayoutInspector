@@ -46,7 +46,7 @@ namespace ObjectLayoutInspector.Tests.RunManually
                 //.Where(t => t.Assembly.FullName.Contains("mscorlib"))
                 .Select(t => TypeLayout.TryGetLayout(t, cache))
                 .Where(t => t != null)
-                .Select(t => t.Value)
+                .Select(t => t!.Value)
                 .ToList();
 
             var top10BiggestInstances = layouts.OrderByDescending(l => l.Size).Take(20);
