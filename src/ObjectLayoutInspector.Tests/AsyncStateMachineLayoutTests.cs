@@ -42,10 +42,10 @@ namespace ObjectLayoutInspector.Tests
         private static (Type taskStateMachine, Type valueTaskStateMachine) GetStateMachineTypes()
         {
             var types = Assembly.GetExecutingAssembly().GetTypes().Where(t =>
-                t.FullName.Contains("AsyncSample") && t.FullName.Contains(">d__")).ToList();
+                t.FullName!.Contains("AsyncSample") && t.FullName.Contains(">d__")).ToList();
 
-            var taskStateMachine = types.First(t => t.FullName.Contains(nameof(AsyncSample.WithTask)));
-            var valueTaskStateMachine = types.First(t => t.FullName.Contains(nameof(AsyncSample.WithValueTask)));
+            var taskStateMachine = types.First(t => t.FullName!.Contains(nameof(AsyncSample.WithTask)));
+            var valueTaskStateMachine = types.First(t => t.FullName!.Contains(nameof(AsyncSample.WithValueTask)));
             return (taskStateMachine, valueTaskStateMachine);
         }
     }

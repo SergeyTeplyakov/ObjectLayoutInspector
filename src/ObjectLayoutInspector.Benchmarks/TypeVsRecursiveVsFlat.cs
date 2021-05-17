@@ -1,9 +1,10 @@
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using ObjectLayoutInspector.Tests;
 
 namespace ObjectLayoutInspector.Benchmarks
 {
-    [CoreJob]
+    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     [MemoryDiagnoser]
     public class TypeVsRecursiveVsFlat
     {

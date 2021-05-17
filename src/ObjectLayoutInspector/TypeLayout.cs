@@ -76,7 +76,7 @@ namespace ObjectLayoutInspector
         }
 
         /// <summary>
-        /// <see cref="LayoutPrinter.Print(Type, bool)"/>
+        /// <see cref="LayoutPrinter.Print(System.Type, bool)"/>
         /// </summary>
         public static void PrintLayout(Type type, bool recursively = true)
         {
