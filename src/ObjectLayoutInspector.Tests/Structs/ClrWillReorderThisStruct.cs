@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace ObjectLayoutInspector.Tests
+namespace ObjectLayoutInspector.Tests.Structs
 {
     // The following attribute has no effect on the layout!
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

@@ -12,13 +12,15 @@ namespace ObjectLayoutInspector.Helpers
         /// <summary>
         /// Returns all instance fields including the fields declared in all base types.
         /// </summary>
-        public static FieldInfo[] GetInstanceFields(this Type type)
+        public static (FieldInfo[] fields, Type[] types) GetInstanceFields(this Type type)
         {
-            return GetBaseTypesAndThis(type).SelectMany(t => GetDeclaredFields(t)).Where(fi => !fi.IsStatic).ToArray();
+            var types = GetBaseTypesAndThis(type).Reverse().ToArray();
+
+            return (types.SelectMany(t => GetDeclaredFields(t)).Where(fi => !fi.IsStatic).ToArray(), types);
 
             IEnumerable<Type> GetBaseTypesAndThis(Type t)
             {
-                while (t != null)
+                while (t is object)
                 {
                     yield return t;
 
@@ -33,8 +35,7 @@ namespace ObjectLayoutInspector.Helpers
                     return ti.DeclaredFields;
                 }
 
-                return t.GetFields(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public |
-                                      BindingFlags.NonPublic);
+                return t.GetFields(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             }
         }
 
@@ -57,6 +58,12 @@ namespace ObjectLayoutInspector.Helpers
             // Value types are handled separately
             if (t.IsValueType)
             {
+                var nullableType = Nullable.GetUnderlyingType(t);
+                if (nullableType is object)
+                {
+                    return Success(GetUninitializedObject(t));
+                }
+
                 return Success(Activator.CreateInstance(t));
             }
 
@@ -70,7 +77,7 @@ namespace ObjectLayoutInspector.Helpers
             // I've got null for some security related types.
             return Success(GetUninitializedObject(t));
 
-            (object? result, bool success) Success(object? o) => (o, o != null);
+            static (object? result, bool success) Success(object? o) => (o, o is object);
         }
 
         private static object? GetUninitializedObject(Type t)
@@ -112,7 +119,8 @@ namespace ObjectLayoutInspector.Helpers
             }
 
             return true;
-            bool IsOpenGenericType(Type type)
+
+            static bool IsOpenGenericType(Type type)
             {
                 return type.IsGenericTypeDefinition && !type.IsConstructedGenericType;
             }
@@ -121,9 +129,15 @@ namespace ObjectLayoutInspector.Helpers
         /// <summary>
         /// Returns true if a given type is unsafe.
         /// </summary>
-        public static bool IsUnsafeValueType(this Type t)
-        {
-            return t.GetCustomAttribute(typeof(UnsafeValueTypeAttribute)) != null;
-        }
+        public static bool IsUnsafeValueType(this Type t) => t.GetCustomAttribute<UnsafeValueTypeAttribute>() is object;
+
+#if NET8_0_OR_GREATER
+        /// <summary>
+        /// Checks if the type is inline array, returns the <see cref="InlineArrayAttribute.Length"/>
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns><see cref="InlineArrayAttribute.Length"/></returns>
+        public static int InlineArrayLength(this Type t) => t.GetCustomAttribute<InlineArrayAttribute>()?.Length ?? 0;
+#endif
     }
 }

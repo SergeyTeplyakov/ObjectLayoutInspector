@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using ObjectLayoutInspector.Tests.Structs;
 
 namespace ObjectLayoutInspector.Tests
 {

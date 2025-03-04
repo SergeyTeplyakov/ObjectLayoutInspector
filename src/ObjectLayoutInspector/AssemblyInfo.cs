@@ -1,4 +1,4 @@
 ﻿
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleToAttribute("ObjectLayoutInspector.Tests")]
+[assembly:InternalsVisibleTo("ObjectLayoutInspector.Tests")]

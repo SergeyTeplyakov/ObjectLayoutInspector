@@ -1,4 +1,4 @@
-﻿namespace ObjectLayoutInspector.Tests
+﻿namespace ObjectLayoutInspector.Tests.Objects
 {
 #pragma warning disable 169 // unused fields
     class Base

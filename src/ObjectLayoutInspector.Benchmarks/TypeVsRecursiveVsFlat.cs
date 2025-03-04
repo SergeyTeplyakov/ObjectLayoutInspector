@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using ObjectLayoutInspector.Tests;
+using ObjectLayoutInspector.Tests.Structs;
 
 namespace ObjectLayoutInspector.Benchmarks
 {

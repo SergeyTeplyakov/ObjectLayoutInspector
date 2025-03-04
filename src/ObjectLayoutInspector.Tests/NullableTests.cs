@@ -3,6 +3,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using ObjectLayoutInspector.Tests.Structs;
 
 namespace ObjectLayoutInspector.Tests
 {

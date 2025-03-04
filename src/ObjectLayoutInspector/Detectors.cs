@@ -13,7 +13,7 @@ namespace ObjectLayoutInspector
                              .CustomAttributes.Where(x => x.AttributeType.Equals(typeof(FixedBufferAttribute)))
                              .Select(x => x.ConstructorArguments)
                              .FirstOrDefault();
-            fixedBuffer = fixedCheck != null ? (int)fixedCheck[1].Value : 0;
+            fixedBuffer = fixedCheck is null ? 0 : (int)fixedCheck[1].Value;
             return fixedBuffer != 0;
         }
 
@@ -21,7 +21,8 @@ namespace ObjectLayoutInspector
             fieldInfo.FieldType.IsPrimitive || fieldInfo.FieldType.IsEnum || fieldInfo.FieldType == typeof(decimal);
 
         public static bool IsNullable(FieldInfo fieldInfo) => IsNullable(fieldInfo.FieldType);
+
         public static bool IsNullable(Type type) =>
-              type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);              
+              type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
     }
 }

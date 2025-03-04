@@ -19,6 +19,11 @@
             An offset of a field from the beginning of a struct.
             </summary>
         </member>
+        <member name="P:ObjectLayoutInspector.FieldLayoutBase.DeclaringType">
+            <summary>
+            Type which declared this field
+            </summary>
+        </member>
         <member name="M:ObjectLayoutInspector.FieldLayoutBase.#ctor(System.Int32,System.Int32)">
             <nodoc />
         </member>
@@ -39,6 +44,9 @@
         <member name="P:ObjectLayoutInspector.FieldLayout.FieldInfo">
             <nodoc />
         </member>
+        <member name="P:ObjectLayoutInspector.FieldLayout.DeclaringType">
+            <nodoc />
+        </member>
         <member name="M:ObjectLayoutInspector.FieldLayout.Equals(System.Object)">
             <inheritdoc />
         </member>
@@ -53,7 +61,10 @@
             Represents a padding between fields.
             </summary>
         </member>
-        <member name="M:ObjectLayoutInspector.Padding.#ctor(System.Int32,System.Int32)">
+        <member name="M:ObjectLayoutInspector.Padding.#ctor(System.Int32,System.Int32,System.Type)">
+            <nodoc />
+        </member>
+        <member name="P:ObjectLayoutInspector.Padding.DeclaringType">
             <nodoc />
         </member>
         <member name="P:ObjectLayoutInspector.Padding.NameOrDescription">
@@ -185,7 +196,37 @@
         </member>
         <member name="P:ObjectLayoutInspector.TypeLayout.Paddings">
             <summary>
-            Size of an empty space in the instance.
+            Size of an always empty space in the instance.
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.TypeLayout.Used">
+            <summary>
+            Size of an always used space in the instance.
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.TypeLayout.Mixed">
+            <summary>
+            Size of empty/or used space in the instance.
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.TypeLayout.UsedBytes">
+            <summary>
+            Array holding used bytes
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.TypeLayout.PaddingBytes">
+            <summary>
+            Array holding padding bytes
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.TypeLayout.MixedBytes">
+            <summary>
+            Array holding mixed bytes
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.TypeLayout.IsUnsafeValueType">
+            <summary>
+            Is the inspected type unsafe, if so the <see cref="P:ObjectLayoutInspector.TypeLayout.Paddings"/> is unknown
             </summary>
         </member>
         <member name="P:ObjectLayoutInspector.TypeLayout.Fields">
@@ -270,6 +311,32 @@
             <param name="considerPrimitives">Eny type in collection will be considered primitive and will not be splitted into several fields.</param>
             <param name="recursive">If true the resulting list will have fields for all nested types as well.</param>
             <param name="hierarchical">Not implemented yet if specified.</param>
+        </member>
+        <member name="M:ObjectLayoutInspector.UnsafeLayout.SizeOf(System.Type)">
+            <summary>
+            Gets the runtime sizeof... from class structure
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+            <remarks>Will return only base size for arrays?: memory size = base size + length * item size</remarks>
+        </member>
+        <member name="F:ObjectLayoutInspector.NullableNode.hasValue">
+            <summary>
+            Boolean.
+            </summary>
+        </member>
+    </members>
+</doc>
+m>
+            <param name="hierarchical">Not implemented yet if specified.</param>
+        </member>
+        <member name="M:ObjectLayoutInspector.UnsafeLayout.SizeOf(System.Type)">
+            <summary>
+            Gets the runtime sizeof... from class structure
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+            <remarks>Will return only base size for arrays?: memory size = base size + length * item size</remarks>
         </member>
         <member name="F:ObjectLayoutInspector.NullableNode.hasValue">
             <summary>

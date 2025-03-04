@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace ObjectLayoutInspector.Tests
+namespace ObjectLayoutInspector.Tests.Structs
 {
 
     [StructLayout(LayoutKind.Sequential)]
@@ -9,8 +9,8 @@ namespace ObjectLayoutInspector.Tests
     {
         public Guid guid;
 
-        public String str1;
-        public String str2;
+        public string str1;
+        public string str2;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -18,10 +18,10 @@ namespace ObjectLayoutInspector.Tests
     {
         public Guid guid;
 
-        public String str1;
-        public String str2;
+        public string str1;
+        public string str2;
 
-        public Int32 i1;
+        public int i1;
     }
 
     [StructLayout(LayoutKind.Explicit)]

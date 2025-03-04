@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using NUnit.Framework;
+using ObjectLayoutInspector.Tests.Objects;
 
 namespace ObjectLayoutInspector.Tests
 {
@@ -17,7 +19,7 @@ namespace ObjectLayoutInspector.Tests
         public void NoFieldsForEmptyClass()
         {
             var layout = TypeLayout.GetLayout<EmptyClass>();
-            Assert.That(layout.Fields, Is.Empty);
+            Assert.That(layout.Fields.OfType<FieldLayout>(), Is.Empty);
         }
     }
 }

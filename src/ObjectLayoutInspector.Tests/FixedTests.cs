@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using ObjectLayoutInspector.Tests.Structs;
 
 namespace ObjectLayoutInspector.Tests
 {
@@ -11,6 +12,7 @@ namespace ObjectLayoutInspector.Tests
         [Test]
         public void FixedBytesNoPadding()
         {
+            TypeLayout.PrintLayout<FixedBytes>(recursively: true);
             var typeLayout = TypeLayout.GetLayout<FixedBytes>(includePaddings: true);
             Assert.That(typeLayout.Paddings, Is.EqualTo(0));
         }

@@ -1,4 +1,4 @@
-﻿namespace ObjectLayoutInspector.Tests
+﻿namespace ObjectLayoutInspector.Tests.Structs
 {
     public struct WithNullableIntStruct
     {

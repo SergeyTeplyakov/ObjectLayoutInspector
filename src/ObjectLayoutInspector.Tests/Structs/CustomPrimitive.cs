@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace ObjectLayoutInspector.Tests
+namespace ObjectLayoutInspector.Tests.Structs
 {
     public struct CustomPrimitive
     {

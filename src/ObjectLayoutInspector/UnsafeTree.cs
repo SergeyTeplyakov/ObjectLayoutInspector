@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using ObjectLayoutInspector.Helpers;
@@ -9,15 +8,10 @@ namespace ObjectLayoutInspector
     internal enum NodeKind : byte
     {
         Primitive,
-
         Complex,
-
         Nullable,
-
         Root,
-
         Fixed,
-
         Reference
     }
 
@@ -25,22 +19,27 @@ namespace ObjectLayoutInspector
     [StructLayout(LayoutKind.Explicit)]
     internal struct FieldNode
     {
-        public static FieldNode[] GetFieldNodes(Type type)
+        public static (FieldNode[] fields, Type[] types) GetFieldNodes(Type type)
         {
-            return ReflectionHelper.GetInstanceFields(type).Select(x =>
+            var (fields, types) = ReflectionHelper.GetInstanceFields(type);
+
+            var fieldNodes = new FieldNode[fields.Length];
+            for (int i = 0; i < fields.Length; i++)
             {
-                int length = 0;
-                return
-                    x.FieldType.IsClass
-                    ? new FieldNode { kind = NodeKind.Reference, referenceNode = new ReferenceNode(x) }
-                    : Detectors.IsPrimitive(x)
-                    ? new FieldNode { kind = NodeKind.Primitive, primitiveNode = new PrimitiveNode { info = x } }
-                    : Detectors.IsNullable(x)
-                    ? new FieldNode { kind = NodeKind.Nullable, nullableNode = new NullableNode { info = x } }
-                    : Detectors.IsFixed(x, out length)
-                    ? new FieldNode { kind = NodeKind.Fixed, fixedNode = new FixedNode { info = x, length = length } }
-                    : new FieldNode { kind = NodeKind.Complex, complexNode = new ComplexNode { info = x } };
-            }).ToArray();
+                var x = fields[i];
+                if (x.FieldType.IsClass)
+                    fieldNodes[i] = new FieldNode { kind = NodeKind.Reference, referenceNode = new ReferenceNode(x) };
+                else if (Detectors.IsPrimitive(x))
+                    fieldNodes[i] = new FieldNode { kind = NodeKind.Primitive, primitiveNode = new PrimitiveNode { info = x } };
+                else if (Detectors.IsNullable(x))
+                    fieldNodes[i] = new FieldNode { kind = NodeKind.Nullable, nullableNode = new NullableNode { info = x } };
+                else if (Detectors.IsFixed(x, out int length))
+                    fieldNodes[i] = new FieldNode { kind = NodeKind.Fixed, fixedNode = new FixedNode { info = x, length = length } };
+                else
+                    fieldNodes[i] = new FieldNode { kind = NodeKind.Complex, complexNode = new ComplexNode { info = x } };
+            }
+
+            return (fieldNodes, types);
         }
 
         [FieldOffset(0)]
@@ -49,15 +48,9 @@ namespace ObjectLayoutInspector
         [FieldOffset(8)]
         public int size;
 
-        [FieldOffset(12)]
-        public int totalOffset;
-
-        [FieldOffset(24)]
-        public FieldInfo info;
-
         [FieldOffset(8)]
         public PrimitiveNode primitiveNode;
-        
+
         [FieldOffset(8)]
         public ComplexNode complexNode;
 
@@ -72,6 +65,12 @@ namespace ObjectLayoutInspector
 
         [FieldOffset(8)]
         public ReferenceNode referenceNode;
+
+        [FieldOffset(12)]
+        public int totalOffset;
+
+        [FieldOffset(24)]
+        public FieldInfo info;
 
         public Type Type => info.FieldType;
     }
@@ -109,7 +108,7 @@ namespace ObjectLayoutInspector
 
         [FieldOffset(16)]
         public FieldInfo info;
-       
+
         // Nullable can be only of Complex or Primitive, so may model FieldNode as remain part only of 2
         // validate of same size and field layout it test and Unsafe.As map to reinterpret cast
         /// <summary>
@@ -124,7 +123,7 @@ namespace ObjectLayoutInspector
         public Type Type => info.FieldType;
     }
 
-    internal class Ref<T> where T: struct
+    internal class Ref<T> where T : struct
     {
         public T value;
 
@@ -165,7 +164,7 @@ namespace ObjectLayoutInspector
         public FieldInfo info;
 
         public Type Type => info.FieldType;
-    } 
+    }
 
     [StructLayout(LayoutKind.Explicit)]
     internal struct ComplexNode
@@ -200,6 +199,6 @@ namespace ObjectLayoutInspector
         [FieldOffset(24)]
         public FieldNode[] children;
 
-        public bool IsPrimitive => children == null;
+        public bool IsPrimitive => children is null;
     }
 }

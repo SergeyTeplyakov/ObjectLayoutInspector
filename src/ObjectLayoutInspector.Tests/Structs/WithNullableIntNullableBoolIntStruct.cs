@@ -1,4 +1,4 @@
-namespace ObjectLayoutInspector.Tests
+namespace ObjectLayoutInspector.Tests.Structs
 {
     public struct WithNullableIntIntStruct
     {
@@ -15,5 +15,5 @@ namespace ObjectLayoutInspector.Tests
         public int three;
 
         public WithNullableIntNullableBoolIntStruct(int? one, bool? two, int three) => (this.one, this.two, this.three) = (one, two, three);
-    }    
+    }
 }

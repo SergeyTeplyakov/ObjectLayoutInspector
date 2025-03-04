@@ -1,4 +1,4 @@
-﻿namespace ObjectLayoutInspector.Tests
+﻿namespace ObjectLayoutInspector.Tests.Objects
 {
     class ByteAndInt
     {

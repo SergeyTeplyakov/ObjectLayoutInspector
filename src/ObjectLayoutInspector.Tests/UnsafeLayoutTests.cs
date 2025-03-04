@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using ObjectLayoutInspector.Tests.Structs;
 
 namespace ObjectLayoutInspector.Tests
 {

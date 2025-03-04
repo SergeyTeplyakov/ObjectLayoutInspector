@@ -1,13 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 16
-VisualStudioVersion = 16.0.28803.156
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35728.132 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectLayoutInspector", "src\ObjectLayoutInspector\ObjectLayoutInspector.csproj", "{D89F0520-ED92-4413-BCB2-5365C13447EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectLayoutInspector.Tests", "src\ObjectLayoutInspector.Tests\ObjectLayoutInspector.Tests.csproj", "{D796C001-E20E-4019-A56B-1A3BE214A281}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectLayoutInspector.Benchmarks", "src\ObjectLayoutInspector.Benchmarks\ObjectLayoutInspector.Benchmarks.csproj", "{B7CA1732-19EB-43B7-9D51-04A7984F03D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectLayoutInspector.Tests.X86", "ObjectLayoutInspector.Tests.X86\ObjectLayoutInspector.Tests.X86.csproj", "{172B168F-FE58-49CB-AF90-669FB96FC077}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectLayoutInspector.Tests.X64", "ObjectLayoutInspector.Tests.X64\ObjectLayoutInspector.Tests.X64.csproj", "{0780619B-6219-4C3D-81F9-CE59A9498B10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		{B7CA1732-19EB-43B7-9D51-04A7984F03D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7CA1732-19EB-43B7-9D51-04A7984F03D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7CA1732-19EB-43B7-9D51-04A7984F03D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{172B168F-FE58-49CB-AF90-669FB96FC077}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{172B168F-FE58-49CB-AF90-669FB96FC077}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{172B168F-FE58-49CB-AF90-669FB96FC077}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{172B168F-FE58-49CB-AF90-669FB96FC077}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0780619B-6219-4C3D-81F9-CE59A9498B10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0780619B-6219-4C3D-81F9-CE59A9498B10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0780619B-6219-4C3D-81F9-CE59A9498B10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0780619B-6219-4C3D-81F9-CE59A9498B10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

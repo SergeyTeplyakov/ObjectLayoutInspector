@@ -45,7 +45,7 @@ namespace ObjectLayoutInspector.Tests.RunManually
             var layouts = GetAllLoadedTypes()
                 //.Where(t => t.Assembly.FullName.Contains("mscorlib"))
                 .Select(t => TypeLayout.TryGetLayout(t, cache))
-                .Where(t => t != null)
+                .Where(t => t.HasValue)
                 .Select(t => t!.Value)
                 .ToList();
 

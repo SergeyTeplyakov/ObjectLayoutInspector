@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace ObjectLayoutInspector.Tests
+namespace ObjectLayoutInspector.Tests.Objects
 {
     [StructLayout(LayoutKind.Explicit, Size = 100)]
     public class ClassWithExplicitLayoutAndOffsetForFirstField

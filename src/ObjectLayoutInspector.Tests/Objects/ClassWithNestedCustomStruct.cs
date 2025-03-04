@@ -1,4 +1,6 @@
-﻿namespace ObjectLayoutInspector.Tests
+﻿using ObjectLayoutInspector.Tests.Structs;
+
+namespace ObjectLayoutInspector.Tests.Objects
 {
     public class ClassWithNestedCustomStruct
     {

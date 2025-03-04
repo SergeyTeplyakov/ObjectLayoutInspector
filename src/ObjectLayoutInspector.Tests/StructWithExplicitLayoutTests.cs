@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using ObjectLayoutInspector.Tests.Structs;
 
 namespace ObjectLayoutInspector.Tests
 {

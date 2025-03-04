@@ -15,11 +15,13 @@ namespace ObjectLayoutInspector.Tests
             return 42;
         }
 
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
         public async ValueTask<int> WithValueTask()
         {
             await Task.Yield();
             return 42;
         }
+#endif
     }
 
     [TestFixture]
@@ -32,12 +34,14 @@ namespace ObjectLayoutInspector.Tests
             TypeLayout.PrintLayout(taskStateMachine);
         }
 
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
         [Test]
         public void AsyncValueTaskStateMachineLayout()
         {
             var (_, valueTask) = GetStateMachineTypes();
             TypeLayout.PrintLayout(valueTask);
         }
+#endif
 
         private static (Type taskStateMachine, Type valueTaskStateMachine) GetStateMachineTypes()
         {
@@ -45,8 +49,14 @@ namespace ObjectLayoutInspector.Tests
                 t.FullName!.Contains("AsyncSample") && t.FullName.Contains(">d__")).ToList();
 
             var taskStateMachine = types.First(t => t.FullName!.Contains(nameof(AsyncSample.WithTask)));
+
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
             var valueTaskStateMachine = types.First(t => t.FullName!.Contains(nameof(AsyncSample.WithValueTask)));
+
             return (taskStateMachine, valueTaskStateMachine);
+#else
+            return (taskStateMachine, null!);
+#endif
         }
     }
-}
+    }

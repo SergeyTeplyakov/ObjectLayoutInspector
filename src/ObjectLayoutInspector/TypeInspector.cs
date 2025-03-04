@@ -27,7 +27,7 @@ namespace ObjectLayoutInspector
             }
 
             var size = GetSizeOfReferenceTypeInstance(type);
-            return (size, 2 * IntPtr.Size);
+            return (size, overhead: 2 * IntPtr.Size);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace ObjectLayoutInspector
 
             // The size of the reference type is computed in the following way:
             // MaxFieldOffset + SizeOfThatField
-            // and round that number to closest point size boundary
+            // and round that number to closest pointer size boundary
             var maxValue = fields.MaxBy(tpl => tpl.offset);
             int sizeCandidate = maxValue.offset + GetFieldSize(maxValue.fieldInfo.FieldType);
 
@@ -113,7 +113,7 @@ namespace ObjectLayoutInspector
         {
             // GetFields does not return private fields from the base types.
             // Need to use a custom helper function.
-            var fields = t.GetInstanceFields();
+            var (fields, types) = t.GetInstanceFields();
             //var fields2 = t.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
 
             Func<object?, long[]> fieldOffsetInspector = GenerateFieldOffsetInspectionFunction(fields);
@@ -136,10 +136,19 @@ namespace ObjectLayoutInspector
             // Converting field addresses to offsets using the first field as a baseline
             return fields
                 .Select((field, index) => (field: field, offset: (int)(addresses[index + 1] - baseLine)))
-                .OrderBy(tpl => tpl.offset)
+                .OrderBy(tpl => GetIndexOf(tpl.field.DeclaringType)).ThenBy(tpl => tpl.offset)
                 .ToArray();
 
             long GetBaseLine(long referenceAddress) => t.IsValueType ? referenceAddress : referenceAddress + IntPtr.Size;
+            int GetIndexOf(Type type)
+            {
+                for (int i = types.Length - 1; i >= 0; i--)
+                {
+                    if (types[i] == type)
+                        return i;
+                }
+                return types.Length;
+            }
         }
 
         private static Func<object?, long[]> GenerateFieldOffsetInspectionFunction(FieldInfo[] fields)
