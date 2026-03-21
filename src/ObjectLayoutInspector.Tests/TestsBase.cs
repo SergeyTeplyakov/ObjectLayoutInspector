@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace ObjectLayoutInspector.Tests
 {
@@ -11,7 +12,7 @@ namespace ObjectLayoutInspector.Tests
             var structLayout = UnsafeLayout.GetLayout<T>(recursive: false);
             var typeLayout = TypeLayout.GetLayout<T>(includePaddings: true);
             CollectionAssert.AreEquivalent(typeLayout.Fields, structLayout);
-            Assert.AreEqual(Unsafe.SizeOf<T>(), typeLayout.Size);
+            Assert.That(Unsafe.SizeOf<T>(), Is.EqualTo(typeLayout.Size));
         }
 
         protected void AssertNonRecursive<T>() where T : struct
@@ -20,7 +21,7 @@ namespace ObjectLayoutInspector.Tests
             var structLayout = UnsafeLayout.GetFieldsLayout<T>(recursive: false);
             var typeLayout = TypeLayout.GetLayout<T>(includePaddings: false);
             CollectionAssert.AreEquivalent(typeLayout.Fields, structLayout);
-            Assert.AreEqual(Unsafe.SizeOf<T>(), typeLayout.Size);
+            Assert.That(Unsafe.SizeOf<T>(), Is.EqualTo(typeLayout.Size));
         }        
     }
 }

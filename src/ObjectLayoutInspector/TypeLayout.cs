@@ -9,7 +9,7 @@ namespace ObjectLayoutInspector
     /// <summary>
     /// Represents layout of a given type.
     /// </summary>
-    public struct TypeLayout : IEquatable<TypeLayout>
+    public readonly record struct TypeLayout
     {
         /// <summary>
         /// A CLR type of the layout.
@@ -170,7 +170,7 @@ namespace ObjectLayoutInspector
         }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is TypeLayout && Equals((TypeLayout)obj);
         }
