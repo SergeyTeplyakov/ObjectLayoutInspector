@@ -162,23 +162,5 @@ namespace ObjectLayoutInspector
                 return new TypeLayout(type, size, overhead, layouts.ToArray(), cache);
             }
         }
-
-        /// <inheritdoc />
-        public bool Equals(TypeLayout other)
-        {
-            return Type == other.Type && Size == other.Size && Overhead == other.Overhead && Paddings == other.Paddings;
-        }
-
-        /// <inheritdoc />
-        public override bool Equals(object? obj)
-        {
-            return obj is TypeLayout && Equals((TypeLayout)obj);
-        }
-
-        /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            return (Type, Size, Overhead, Paddings).GetHashCode();
-        }
     }
 }
