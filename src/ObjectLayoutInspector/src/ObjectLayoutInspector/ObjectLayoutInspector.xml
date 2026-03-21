@@ -4,6 +4,81 @@
         <name>ObjectLayoutInspector</name>
     </assembly>
     <members>
+        <member name="T:ObjectLayoutInspector.ArrayLayout">
+            <summary>
+            Represents the memory layout of an array instance.
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.ArrayLayout.ElementType">
+            <summary>
+            The element type of the array.
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.ArrayLayout.Length">
+            <summary>
+            Number of elements in the array.
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.ArrayLayout.ElementSize">
+            <summary>
+            Size of a single element in bytes.
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.ArrayLayout.HeaderSize">
+            <summary>
+            Object header size (sync block + method table pointer).
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.ArrayLayout.LengthFieldSize">
+            <summary>
+            Size of the array length field (always 4 bytes — DWORD m_NumComponents in CoreCLR).
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.ArrayLayout.LengthPadding">
+            <summary>
+            Padding after the length field to align element data to pointer-size boundary.
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.ArrayLayout.TotalSize">
+            <summary>
+            Total size of the array instance in bytes (header + length + elements + padding).
+            </summary>
+        </member>
+        <member name="P:ObjectLayoutInspector.ArrayLayout.TrailingPadding">
+            <summary>
+            Padding at the end to align to pointer-size boundary.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.ArrayLayout.GetLayout``1(System.Int32)">
+            <summary>
+            Gets the layout of an array of <typeparamref name="T"/> with the specified <paramref name="length"/>.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.ArrayLayout.GetLayout(System.Type,System.Int32)">
+            <summary>
+            Gets the layout of an array of <paramref name="elementType"/> with the specified <paramref name="length"/>.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.ArrayLayout.PrintLayout``1(System.Int32,System.Boolean)">
+            <summary>
+            Prints the array layout to the console.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.ArrayLayout.PrintLayout(System.Type,System.Int32,System.Boolean)">
+            <summary>
+            Prints the array layout to the console.
+            </summary>
+        </member>
+        <member name="M:ObjectLayoutInspector.ArrayLayout.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:ObjectLayoutInspector.ArrayLayout.ToString(System.Boolean)">
+            <summary>
+            Returns a string representation of the array layout.
+            When <paramref name="showElementLayout"/> is true and the element type is a reference type,
+            prints the array layout side-by-side with the element's heap layout.
+            </summary>
+        </member>
         <member name="T:ObjectLayoutInspector.FieldLayoutBase">
             <summary>
             Base type that represents different field layouts.
@@ -193,12 +268,14 @@
         </member>
         <member name="M:ObjectLayoutInspector.TypeLayout.PrintLayout``1(System.Boolean)">
             <summary>
-            <see cref="M:ObjectLayoutInspector.LayoutPrinter.Print``1(System.Boolean)"/>
+            Prints the layout of <typeparamref name="T"/> to the console.
+            For array types, prints the array layout with a default length of 3.
             </summary>
         </member>
         <member name="M:ObjectLayoutInspector.TypeLayout.PrintLayout(System.Type,System.Boolean)">
             <summary>
-            <see cref="M:ObjectLayoutInspector.LayoutPrinter.Print(System.Type,System.Boolean)"/>
+            Prints the layout of a given <paramref name="type"/> to the console.
+            For array types, prints the array layout with a default length of 3.
             </summary>
         </member>
         <member name="M:ObjectLayoutInspector.TypeLayout.ToString">

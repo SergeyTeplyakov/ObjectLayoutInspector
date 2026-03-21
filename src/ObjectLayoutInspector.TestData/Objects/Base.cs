@@ -1,7 +1,7 @@
-﻿namespace ObjectLayoutInspector.Tests
+namespace ObjectLayoutInspector.Tests
 {
 #pragma warning disable 169 // unused fields
-    class Base
+    public class Base
     {
         private object? o;
     }

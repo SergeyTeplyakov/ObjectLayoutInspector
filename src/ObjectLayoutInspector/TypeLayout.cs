@@ -68,18 +68,33 @@ namespace ObjectLayoutInspector
         }
 
         /// <summary>
-        /// <see cref="LayoutPrinter.Print{T}(bool)"/>
+        /// Prints the layout of <typeparamref name="T"/> to the console.
+        /// For array types, prints the array layout with a default length of 3.
         /// </summary>
         public static void PrintLayout<T>(bool recursively = true)
         {
+            var type = typeof(T);
+            if (type.IsArray)
+            {
+                ArrayLayout.PrintLayout(type.GetElementType(), 3, showElementLayout: true);
+                return;
+            }
+
             LayoutPrinter.Print<T>(recursively);
         }
 
         /// <summary>
-        /// <see cref="LayoutPrinter.Print(System.Type, bool)"/>
+        /// Prints the layout of a given <paramref name="type"/> to the console.
+        /// For array types, prints the array layout with a default length of 3.
         /// </summary>
         public static void PrintLayout(Type type, bool recursively = true)
         {
+            if (type.IsArray)
+            {
+                ArrayLayout.PrintLayout(type.GetElementType(), 3, showElementLayout: true);
+                return;
+            }
+
             LayoutPrinter.Print(type, recursively);
         }
 

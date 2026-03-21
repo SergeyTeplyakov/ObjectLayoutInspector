@@ -1,6 +1,6 @@
-﻿namespace ObjectLayoutInspector.Tests
+namespace ObjectLayoutInspector.Tests
 {
-    class ByteAndInt
+    public class ByteAndInt
     {
         public byte b { get; }
         public int n;
