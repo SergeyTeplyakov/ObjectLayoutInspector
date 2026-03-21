@@ -4,6 +4,8 @@
 
 ![Demo](images/FieldsLayout_Figure1.gif "Demo")
 
+> **Note:** All layout examples and sizes shown in this document assume x64 (64-bit) runtime. The library currently targets x64 only — results on x86 are not supported.
+
 ## Getting Started
 
 Install the NuGet package:
@@ -427,3 +429,100 @@ Even though the size of the `ByteWrapper` is 1 byte, the CLR aligns each field o
 > **Note:** Starting with .NET 7, the CLR has optimized the automatic layout for this case — the per-field padding for small struct wrappers is no longer applied, and the layout now matches the sequential layout (8 bytes total) without any manual intervention.
 >
 > For older runtimes, you can avoid this overhead by applying `[StructLayout(LayoutKind.Sequential)]` to the class. Despite the attribute's name, it works on classes as well — the [docs confirm](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.structlayoutattribute) it "lets you control the physical layout of the data fields of a class or structure in memory".
+
+## Inspecting array layouts
+
+Arrays have a unique memory layout: an object header, a method table pointer, a length field, and then contiguous element data. You can inspect this layout with `TypeLayout.PrintLayout<T[]>()` or the `ArrayLayout` class directly.
+
+### Value type arrays
+
+```csharp
+TypeLayout.PrintLayout<int[]>();
+```
+
+```
+Array layout for 'Int32[3]'
+Element type: Int32. Element size: 4 bytes. Length: 3
+Total size: 40 bytes (Header: 16, Length: 4, Length Padding: 4, Data: 12, Trailing Padding: 4)
+
+|===============================|
+| Object Header (8 bytes)       |
+|-------------------------------|
+| Method Table Ptr (8 bytes)    |
+|===============================|
+| Length (4 bytes) = 3          |
+|-------------------------------|
+| padding (4 bytes)             |
+|-------------------------------|
+|    24-27: [0] Int32 (4 bytes) |
+|-------------------------------|
+|    28-31: [1] Int32 (4 bytes) |
+|-------------------------------|
+|    32-35: [2] Int32 (4 bytes) |
+|-------------------------------|
+|    36-39: padding (4 bytes)   |
+|===============================|
+```
+
+Note the trailing padding: the total array size is rounded up to the pointer-size boundary. Also note that the array length field is always 4 bytes (`DWORD m_NumComponents` in CoreCLR), with 4 bytes of alignment padding on x64 to align element data to an 8-byte boundary.
+
+### Reference type arrays
+
+For reference type arrays, the element slots hold pointers. When printing side-by-side, the element type layout is shown alongside the array layout:
+
+```csharp
+class PointRef
+{
+    public int X;
+    public int Y;
+}
+
+TypeLayout.PrintLayout<PointRef[]>();
+```
+
+```
+Array layout for 'PointRef[3]'
+Element type: PointRef. Element size: 8 bytes. Length: 3
+Total size: 48 bytes (Header: 16, Length: 4, Length Padding: 4, Data: 24, Trailing Padding: 0)
+
+|==============================================|
+| Object Header (8 bytes)                      |
+|----------------------------------------------|
+| Method Table Ptr (8 bytes)                   |
+|==============================================|
+| Length (4 bytes) = 3                         |
+|----------------------------------------------|
+| padding (4 bytes)                            |
+|----------------------------------------------|
+|    24-31: [0] PointRef (reference) (8 bytes) |
+|----------------------------------------------|
+|    32-39: [1] PointRef (reference) (8 bytes) |
+|----------------------------------------------|
+|    40-47: [2] PointRef (reference) (8 bytes) |
+|==============================================|
+
+  Element layout:
+
+  Type layout for 'PointRef'
+  Size: 8 bytes. Paddings: 0 bytes (%0 of empty space)
+  |============================|
+  | Object Header (8 bytes)    |
+  |----------------------------|
+  | Method Table Ptr (8 bytes) |
+  |============================|
+  |   0-3: Int32 X (4 bytes)   |
+  |----------------------------|
+  |   4-7: Int32 Y (4 bytes)   |
+  |============================|
+```
+
+### Using the `ArrayLayout` class directly
+
+For more control, use `ArrayLayout.GetLayout<T>(int length)` to inspect arrays of any length:
+
+```csharp
+var layout = ArrayLayout.GetLayout<int>(10);
+Console.WriteLine(layout.TotalSize);       // total bytes on the heap
+Console.WriteLine(layout.ElementSize);     // size of one element
+Console.WriteLine(layout.TrailingPadding); // wasted trailing bytes
+```

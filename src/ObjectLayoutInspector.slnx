@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="ObjectLayoutInspector/ObjectLayoutInspector.csproj" />
+  <Project Path="ObjectLayoutInspector.TestData/ObjectLayoutInspector.TestData.csproj" />
   <Project Path="ObjectLayoutInspector.Tests/ObjectLayoutInspector.Tests.csproj" />
   <Project Path="ObjectLayoutInspector.Benchmarks/ObjectLayoutInspector.Benchmarks.csproj" />
 </Solution>

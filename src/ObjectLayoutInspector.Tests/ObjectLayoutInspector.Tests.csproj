@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ObjectLayoutInspector\ObjectLayoutInspector.csproj" />
+    <ProjectReference Include="..\ObjectLayoutInspector.TestData\ObjectLayoutInspector.TestData.csproj" />
   </ItemGroup>
 
   <!-- Framework-specific test files -->

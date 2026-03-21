@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 namespace ObjectLayoutInspector.Tests
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct SequentialIntObjectStruct
+public struct SequentialIntObjectStruct
     {
         public int theInt;
 

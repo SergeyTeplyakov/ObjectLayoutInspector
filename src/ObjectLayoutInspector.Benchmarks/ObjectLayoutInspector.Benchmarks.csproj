@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ObjectLayoutInspector\ObjectLayoutInspector.csproj" />
-    <ProjectReference Include="..\ObjectLayoutInspector.Tests\ObjectLayoutInspector.Tests.csproj" />
+    <ProjectReference Include="..\ObjectLayoutInspector.TestData\ObjectLayoutInspector.TestData.csproj" />
   </ItemGroup>
 
 </Project>
