@@ -222,15 +222,6 @@
             Gets a layout of a given <paramref name="type"/>.
             </summary>
         </member>
-        <member name="M:ObjectLayoutInspector.TypeLayout.Equals(ObjectLayoutInspector.TypeLayout)">
-            <inheritdoc />
-        </member>
-        <member name="M:ObjectLayoutInspector.TypeLayout.Equals(System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:ObjectLayoutInspector.TypeLayout.GetHashCode">
-            <inheritdoc />
-        </member>
         <member name="T:ObjectLayoutInspector.TypeLayoutCache">
             <summary>
             Thread-safe cache for type layouts.

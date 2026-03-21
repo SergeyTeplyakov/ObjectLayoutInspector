@@ -59,7 +59,7 @@ namespace ObjectLayoutInspector
         public FieldInfo FieldInfo { get; }
 
         /// <inheritdoc />
-        public override bool Equals(object obj) =>
+        public override bool Equals(object? obj) =>
             obj is FieldLayout fieldLayout
             && Offset == fieldLayout.Offset
             && Size == fieldLayout.Size
@@ -90,7 +90,7 @@ namespace ObjectLayoutInspector
         protected override string NameOrDescription => "padding";
 
         /// <inheritdoc />
-        public override bool Equals(object obj) =>
+        public override bool Equals(object? obj) =>
             obj is Padding padding
             && Offset == padding.Offset
             && Size == padding.Size;

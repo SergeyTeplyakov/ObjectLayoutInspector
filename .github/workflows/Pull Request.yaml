@@ -9,14 +9,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '3.1.x'
+        dotnet-version: '10.0.x'
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore src/ObjectLayoutInspector.slnx
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build src/ObjectLayoutInspector.slnx --no-restore
     - name: Test
-      run: dotnet test --no-restore
+      run: dotnet test src/ObjectLayoutInspector.Tests/ObjectLayoutInspector.Tests.csproj --no-restore
