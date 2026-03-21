@@ -4,6 +4,49 @@
 
 ![Demo](images/FieldsLayout_Figure1.gif "Demo")
 
+## Getting Started
+
+Install the NuGet package:
+
+```
+dotnet add package ObjectLayoutInspector
+```
+
+Print the layout of any type:
+
+```csharp
+using ObjectLayoutInspector;
+
+// Print the layout to the console
+TypeLayout.PrintLayout<YourType>();
+
+// Or get the layout programmatically
+TypeLayout layout = TypeLayout.GetLayout<YourType>();
+Console.WriteLine(layout);
+```
+
+Example output:
+
+```
+Type layout for 'NotAlignedStruct'
+Size: 12 bytes. Paddings: 4 bytes (%33 of empty space)
+|================================|
+|     0: Byte m_byte1 (1 byte)   |
+|--------------------------------|
+|   1-3: padding (3 bytes)       |
+|--------------------------------|
+|   4-7: Int32 m_int (4 bytes)   |
+|--------------------------------|
+|     8: Byte m_byte2 (1 byte)   |
+|--------------------------------|
+|     9: padding (1 byte)        |
+|--------------------------------|
+| 10-11: Int16 m_short (2 bytes) |
+|================================|
+```
+
+## How it works
+
 There is no official documentation about fields layout because the CLR authors reserved the right to change it in the future. But knowledge about the layout can be helpful if you're curious or if you're working on a performance critical application.
 
 How can we inspect the layout? We can look at a raw memory in Visual Studio or use !dumpobj command in [SOS Debugging Extension](https://docs.microsoft.com/en-us/dotnet/framework/tools/sos-dll-sos-debugging-extension). These approaches are tedious and boring, so we'll try to write a tool  that will print an object layout at runtime.
