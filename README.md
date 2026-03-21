@@ -4,6 +4,49 @@
 
 ![Demo](images/FieldsLayout_Figure1.gif "Demo")
 
+## Getting Started
+
+Install the NuGet package:
+
+```
+dotnet add package ObjectLayoutInspector
+```
+
+Print the layout of any type:
+
+```csharp
+using ObjectLayoutInspector;
+
+// Print the layout to the console
+TypeLayout.PrintLayout<YourType>();
+
+// Or get the layout programmatically
+TypeLayout layout = TypeLayout.GetLayout<YourType>();
+Console.WriteLine(layout);
+```
+
+Example output:
+
+```
+Type layout for 'NotAlignedStruct'
+Size: 12 bytes. Paddings: 4 bytes (%33 of empty space)
+|================================|
+|     0: Byte m_byte1 (1 byte)   |
+|--------------------------------|
+|   1-3: padding (3 bytes)       |
+|--------------------------------|
+|   4-7: Int32 m_int (4 bytes)   |
+|--------------------------------|
+|     8: Byte m_byte2 (1 byte)   |
+|--------------------------------|
+|     9: padding (1 byte)        |
+|--------------------------------|
+| 10-11: Int16 m_short (2 bytes) |
+|================================|
+```
+
+## How it works
+
 There is no official documentation about fields layout because the CLR authors reserved the right to change it in the future. But knowledge about the layout can be helpful if you're curious or if you're working on a performance critical application.
 
 How can we inspect the layout? We can look at a raw memory in Visual Studio or use !dumpobj command in [SOS Debugging Extension](https://docs.microsoft.com/en-us/dotnet/framework/tools/sos-dll-sos-debugging-extension). These approaches are tedious and boring, so we'll try to write a tool  that will print an object layout at runtime.
@@ -380,3 +423,7 @@ Size: 24 bytes. Paddings: 21 bytes    Size: 8 bytes. Paddings: 5 bytes
 ```
 
 Even though the size of the `ByteWrapper` is 1 byte, the CLR aligns each field on the pointer boundaries! **If the type layout is `LayoutKind.Auto`** the CLR will pad each field of a **custom value type**! This means that if you have multiple structs that wraps just a single `int` or `byte` and they're widely used in millions of objects, you could have a noticeable memory overhead!
+
+> **Note:** Starting with .NET 7, the CLR has optimized the automatic layout for this case — the per-field padding for small struct wrappers is no longer applied, and the layout now matches the sequential layout (8 bytes total) without any manual intervention.
+>
+> For older runtimes, you can avoid this overhead by applying `[StructLayout(LayoutKind.Sequential)]` to the class. Despite the attribute's name, it works on classes as well — the [docs confirm](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.structlayoutattribute) it "lets you control the physical layout of the data fields of a class or structure in memory".
