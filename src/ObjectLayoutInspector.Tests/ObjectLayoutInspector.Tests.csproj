@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>net48;net8.0;net10.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -15,6 +15,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ObjectLayoutInspector\ObjectLayoutInspector.csproj" />
+  </ItemGroup>
+
+  <!-- Framework-specific test files -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Compile Remove="**/*.NetCore.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'net48'">
+    <Compile Remove="**/*.Net48.cs" />
   </ItemGroup>
 
 </Project>
