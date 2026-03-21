@@ -19,4 +19,4 @@ jobs:
     - name: Build
       run: dotnet build src/ObjectLayoutInspector.slnx --no-restore
     - name: Test
-      run: dotnet test src/ObjectLayoutInspector.slnx --no-restore
+      run: dotnet test src/ObjectLayoutInspector.Tests/ObjectLayoutInspector.Tests.csproj --no-restore
