@@ -15,8 +15,8 @@ jobs:
       with:
         dotnet-version: '10.0.x'
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore src/ObjectLayoutInspector.slnx
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build src/ObjectLayoutInspector.slnx --no-restore
     - name: Test
-      run: dotnet test --no-restore
+      run: dotnet test src/ObjectLayoutInspector.slnx --no-restore
