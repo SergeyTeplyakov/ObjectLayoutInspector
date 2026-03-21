@@ -7,7 +7,7 @@ using NUnit.Framework.Internal;
 namespace ObjectLayoutInspector.Tests
 {
     [TestFixture]
-    public class ComplexUnsafeLayoutTests : TestsBase
+    public partial class ComplexUnsafeLayoutTests : TestsBase
     {
         //TODO: https://github.com/SergeyTeplyakov/ObjectLayoutInspector/issues/20
         //[Test]
@@ -33,16 +33,6 @@ namespace ObjectLayoutInspector.Tests
 
         [Test]
         public void MASTER_STRUCT() => AssertNonRecursiveWithPadding<MASTER_STRUCT>();
-
-        [Test]
-        public void MASTER_STRUCTFieldsRecursive()
-        {
-            var structLayout = UnsafeLayout.GetLayout<MASTER_STRUCT>(recursive: true, new List<Type> { typeof(Guid) });
-            // .NET 10 reorders Sequential struct fields at runtime (references before value types),
-            // shifting the Guid fields in the Explicit union and introducing a trailing padding entry.
-            // Prior runtimes produced 7 items (no trailing padding); .NET 10 produces 8.
-            Assert.AreEqual(8, structLayout.Count());
-        }
 
         [Test]
         public void STRUCT1() => AssertNonRecursiveWithPadding<STRUCT1>();
