@@ -423,3 +423,7 @@ Size: 24 bytes. Paddings: 21 bytes    Size: 8 bytes. Paddings: 5 bytes
 ```
 
 Even though the size of the `ByteWrapper` is 1 byte, the CLR aligns each field on the pointer boundaries! **If the type layout is `LayoutKind.Auto`** the CLR will pad each field of a **custom value type**! This means that if you have multiple structs that wraps just a single `int` or `byte` and they're widely used in millions of objects, you could have a noticeable memory overhead!
+
+> **Note:** Starting with .NET 7, the CLR has optimized the automatic layout for this case — the per-field padding for small struct wrappers is no longer applied, and the layout now matches the sequential layout (8 bytes total) without any manual intervention.
+>
+> For older runtimes, you can avoid this overhead by applying `[StructLayout(LayoutKind.Sequential)]` to the class. Despite the attribute's name, it works on classes as well — the [docs confirm](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.structlayoutattribute) it "lets you control the physical layout of the data fields of a class or structure in memory".
