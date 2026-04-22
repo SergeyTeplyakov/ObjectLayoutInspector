@@ -19,6 +19,15 @@ namespace ObjectLayoutInspector.Tests
             Assert.AreEqual(Unsafe.SizeOf<Nullable<bool>>(), typeLayout.Size);
         }
 
+        // Regression test for https://github.com/SergeyTeplyakov/ObjectLayoutInspector/issues/40
+        [Test]
+        public void NullableInt_HasFields()
+        {
+            var typeLayout = TypeLayout.GetLayout<int?>(includePaddings: false);
+            Assert.AreEqual(Unsafe.SizeOf<int?>(), typeLayout.Size);
+            Assert.That(typeLayout.Fields.Length, Is.GreaterThan(0), "Nullable<int> layout should have fields");
+        }
+
         [Test]
         public void NullableLongByteStruct()
         {
@@ -99,6 +108,28 @@ namespace ObjectLayoutInspector.Tests
             Assert.AreEqual(1, unsafeLayout[0].Size);
             Assert.AreEqual(4, unsafeLayout[1].Offset);
             Assert.AreEqual(4, unsafeLayout[1].Size);
+        }
+
+        [Test]
+        public void NullableArrayWithValues()
+        {
+            // Exact same code path as the sample: ArrayLayout.PrintLayout((Array)nullables)
+            var nullables = new int?[] { 42, null, 7, null };
+            var layout = ArrayLayout.GetLayout(typeof(int?), nullables.Length);
+            var result = layout.ToStringWithValues(nullables);
+            Assert.That(result, Does.Contain("42"));
+            Assert.That(result, Does.Contain("null"));
+        }
+
+        [Test]
+        public void StructArrayWithValues()
+        {
+            var points = new WithNullableIntStruct[]
+            {
+                default,
+                default
+            };
+            ArrayLayout.PrintLayout(points);
         }
     }
 }
