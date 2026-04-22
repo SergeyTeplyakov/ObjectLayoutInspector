@@ -23,12 +23,12 @@
 
   <PropertyGroup>
     <PackageId>ObjectLayoutInspector</PackageId>
-    <PackageVersion>0.1.2.0</PackageVersion>
+    <PackageVersion>0.2.0.0</PackageVersion>
     <Authors>SergeyTeplyakov</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/SergeyTeplyakov/ObjectLayoutInspector</PackageProjectUrl>
     <Description>Library for getting a CLR instance's layout at runtime</Description>
-    <PackageReleaseNotes>Added layout via Unsafe.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added array layout support; .NET 10 compatibility; updated dependencies; multi-targeted tests (net48, net8.0, net10.0).</PackageReleaseNotes>
     <Copyright>Copyright Sergey Teplyakov</Copyright>
     <PackageTags>clr_internals;unsafe;</PackageTags>
   </PropertyGroup>

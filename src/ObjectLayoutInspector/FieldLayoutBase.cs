@@ -73,7 +73,19 @@ namespace ObjectLayoutInspector
 
         /// <inheritdoc />
         protected override string NameOrDescription =>
-            $"{FieldInfo.FieldType.Name} {FieldInfo.Name}";
+            $"{FieldInfo.FieldType.Name} {CleanFieldName(FieldInfo.Name)}";
+
+        private static string CleanFieldName(string name)
+        {
+            // Strip compiler-generated backing field syntax: <PropertyName>k__BackingField -> PropertyName
+            if (name.Length > 2 && name[0] == '<')
+            {
+                int end = name.IndexOf('>');
+                if (end > 1)
+                    return name.Substring(1, end - 1);
+            }
+            return name;
+        }
     }
 
     /// <summary>

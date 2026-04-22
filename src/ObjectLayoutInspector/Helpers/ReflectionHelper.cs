@@ -57,7 +57,11 @@ namespace ObjectLayoutInspector.Helpers
             // Value types are handled separately
             if (t.IsValueType)
             {
-                return Success(Activator.CreateInstance(t));
+                // Activator.CreateInstance for Nullable<T> returns null due to boxing rules,
+                // so we use GetUninitializedObject for nullable types instead.
+                return Nullable.GetUnderlyingType(t) != null
+                    ? Success(GetUninitializedObject(t))
+                    : Success(Activator.CreateInstance(t));
             }
 
             // String is handled separately as well due to security restrictions
